@@ -1,0 +1,16 @@
+Customer: Hi, I’m really upset right now. I placed an order three days ago, the money was deducted from my account, but I haven’t received the product yet. This is not acceptable.
+Agent: I’m very sorry to hear that you’re experiencing this. I understand how concerning it can be when money is deducted and the order hasn’t arrived. Let me look into this for you right away.
+Customer: This is the second time this has happened. I paid ₹8,499 for a wireless headset, and the amount was debited immediately. My bank shows the transaction was successful, but your app says “processing.”
+Agent: Thank you for sharing those details. May I please have your order ID or the registered phone number so I can check the status?
+Customer: Yes, the order ID is ORD4589217. The payment was made using my debit card ending with 7834.
+Agent: Thank you. Please allow me a moment while I check the system.
+(Short pause)
+Agent: I can see the order here. It appears the payment was received successfully, but there was a delay in warehouse dispatch due to a system update. I sincerely apologize for the inconvenience.
+Customer: But why wasn’t I informed? My money has been stuck for three days. What if I never receive it? I’m honestly worried I’ve lost my money.
+Agent: I completely understand your concern. Please be assured that your payment is secure and linked to your order. You have not lost your money. The order is scheduled for dispatch within the next 24 hours.
+Customer: If I don’t get it tomorrow, I want a full refund immediately. I can’t afford to just lose ₹8,499 like this.
+Agent: That is absolutely fair. If the order is not dispatched within 24 hours, we will initiate a full refund to your original payment method. I will personally mark this order as high priority and send you a confirmation email shortly.
+Customer: Okay… I just want this resolved quickly. I’ve had a stressful week already.
+Agent: I completely understand. Thank you for your patience. I’ve escalated the case to our logistics team, and you will receive a tracking update soon. Is there anything else I can assist you with today?
+Customer: No, that’s all. Please just make sure this gets fixed.
+Agent: Absolutely. We appreciate your trust, and we’ll ensure this is resolved promptly. Have a good day, and please feel free to reach out if you need further assistance.

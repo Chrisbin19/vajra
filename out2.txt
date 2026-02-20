@@ -1,0 +1,113 @@
+D:\projects\vajra-1\conversation-intelligence\core\gemini.py:8: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+Running Phase 2 analysis...
+============================================================
+Ô£à PASS | status: completed
+Ô£à PASS | summary: The customer contacted State Bank support regarding an unauthorized transaction 
+Ô£à PASS | language_detected: en
+Ô£à PASS | sentiment_score in [-1, 1]: 0.2
+Ô£à PASS | primary_intent (string): dispute_unauthorized_transaction
+Ô£à PASS | secondary_intents (list): ['request_card_block', 'raise_dispute']
+Ô£à PASS | entities.amounts_mentioned: ['Rs.4200']
+Ô£à PASS | topics_discussed (list): ['unauthorized transaction', 'account security', 'dispute resolution', 'card blocking', 'identity verification']
+Ô£à PASS | processing_time_ms: 8223ms
+============================================================
+Ô£à ALL CHECKS PASSED ÔÇö Phase 2 deliverable complete!
+
+Full result JSON:
+{
+  "summary": "The customer contacted State Bank support regarding an unauthorized transaction of Rs.4200 on their account from January 14th. The agent, Priya, verified the customer's identity, acknowledged the concern, and took immediate action by raising a dispute ticket and blocking the card. The customer expressed relief at the resolution.",
+  "language_detected": "en",
+  "languages_all": [
+    "en"
+  ],
+  "sentiment": {
+    "overall": "mixed",
+    "sentiment_score": 0.2,
+    "customer_sentiment": "Initially worried and anxious, ending relieved and grateful.",
+    "agent_sentiment": "Empathetic, professional, and reassuring.",
+    "emotional_arc": [
+      "Customer: worried -> relieved",
+      "Agent: professional -> helpful"
+    ],
+    "frustration_detected": true
+  },
+  "primary_intent": "dispute_unauthorized_transaction",
+  "secondary_intents": [
+    "request_card_block",
+    "raise_dispute"
+  ],
+  "topics_discussed": [
+    "unauthorized transaction",
+    "account security",
+    "dispute resolution",
+    "card blocking",
+    "identity verification"
+  ],
+  "entities": {
+    "amounts_mentioned": [
+      "Rs.4200"
+    ],
+    "dates_mentioned": [
+      "January 14th"
+    ],
+    "account_references": [
+      "7823"
+    ],
+    "products_mentioned": [
+      "account",
+      "card"
+    ],
+    "locations_mentioned": [],
+    "people_mentioned": [
+      "Priya"
+    ]
+  },
+  "compliance": {
+    "violations_detected": [],
+    "policies_checked": [
+      "Monitor and flag any mention of: unauthorized transaction, fraud, OTP shared, large transfer"
+    ],
+    "risk_level": "high",
+    "escalation_required": false,
+    "risk_flags": [
+      "unauthorized_transaction"
+    ]
+  },
+  "agent_performance": {
+    "score": 95,
+    "greeting_proper": true,
+    "empathy_shown": true,
+    "issue_resolved": true,
+    "call_outcome": "resolved",
+    "strengths": [
+      "Provided a proper greeting",
+      "Showed empathy and understanding",
+      "Verified customer identity",
+      "Took immediate and appropriate action (raising dispute, blocking card)",
+      "Communicated next steps clearly"
+    ],
+    "improvements": []
+  },
+  "speakers": {
+    "speakers_detected": 2,
+    "speaker_labels": [
+      "Agent",
+      "Customer"
+    ],
+    "language_per_speaker": {
+      "Agent": "en",
+      "Customer": "en"
+    }
+  },
+  "processing_time_ms": 8223,
+  "status": "completed",
+  "input_type": "text"
+}

@@ -67,6 +67,24 @@ You must evaluate the conversation strictly against these compliance policies:
 You MUST return ONLY valid JSON representing the exact analysis results. Start your response with { and end with }.
 Do not wrap your result in markdown blocks (e.g. no ```json). Do not include explanations.
 
+SENTIMENT SCORING RULES:
+- Provide sentiment_score as a float between -1.0 and +1.0
+- -1.0 = extremely negative/angry
+-  0.0 = completely neutral
+- +1.0 = extremely positive/satisfied
+- Score the OVERALL conversation arc, not just start or end
+- Example: customer starts frustrated (-0.7), ends satisfied (+0.6) -> score: 0.0 (mixed)
+
+INTENT EXTRACTION RULES:
+- primary_intent: The SINGLE main reason the customer called. One string. Snake_case.
+  Examples: dispute_transaction, check_balance, report_fraud, request_refund,
+            update_details, complaint_agent, request_card_block, loan_inquiry
+            
+- secondary_intents: Additional things the customer wanted. Can be empty list [].
+  These are supporting requests that came up during the call.
+  
+- IMPORTANT: primary_intent must always be a single string, not a list.
+
 Your JSON must match this exact schema:
 {
     "summary": "string (2-4 sentences describing the full conversation)",
@@ -74,12 +92,14 @@ Your JSON must match this exact schema:
     "languages_all": ["string"],
     "sentiment": {
         "overall": "positive|negative|neutral|mixed",
+        "sentiment_score": -1.0,
         "customer_sentiment": "string",
         "agent_sentiment": "string",
         "emotional_arc": ["string"],
         "frustration_detected": boolean
     },
-    "customer_intents": ["string snake_case"],
+    "primary_intent": "string snake_case",
+    "secondary_intents": ["string snake_case"],
     "topics_discussed": ["string"],
     "entities": {
         "amounts_mentioned": ["string"],
@@ -167,6 +187,7 @@ def _build_result_from_dict(
 
     sentiment = SentimentAnalysis(
         overall=sentiment_dict.get("overall", "neutral"),
+        sentiment_score=float(sentiment_dict.get("sentiment_score", 0.0)),
         customer_sentiment=sentiment_dict.get("customer_sentiment", ""),
         agent_sentiment=sentiment_dict.get("agent_sentiment", ""),
         emotional_arc=sentiment_dict.get("emotional_arc", []),
@@ -218,7 +239,8 @@ def _build_result_from_dict(
         language_detected=data.get("language_detected", "unknown"),
         languages_all=data.get("languages_all", []),
         sentiment=sentiment,
-        customer_intents=data.get("customer_intents", []),
+        primary_intent=data.get("primary_intent", "general_inquiry"),
+        secondary_intents=data.get("secondary_intents", []),
         topics_discussed=data.get("topics_discussed", []),
         entities=entities,
         compliance=compliance,
@@ -281,8 +303,8 @@ async def analyze_audio(conversation_id: str, client_id: str, audio_path: str, c
             error=str(e),
             processing_time_ms=int((time.time() - start_time) * 1000),
             summary="", language_detected="", languages_all=[],
-             sentiment=SentimentAnalysis.model_construct(overall="", customer_sentiment="", agent_sentiment="", emotional_arc=[], frustration_detected=False),
-             customer_intents=[], topics_discussed=[],
+             sentiment=SentimentAnalysis.model_construct(overall="", sentiment_score=0.0, customer_sentiment="", agent_sentiment="", emotional_arc=[], frustration_detected=False),
+             primary_intent="general_inquiry", secondary_intents=[], topics_discussed=[],
              entities=EntityExtraction.model_construct(amounts_mentioned=[], dates_mentioned=[], account_references=[], products_mentioned=[], locations_mentioned=[], people_mentioned=[]),
              compliance=ComplianceCheck.model_construct(violations_detected=[], policies_checked=[], risk_level="", escalation_required=False, risk_flags=[]),
              agent_performance=AgentPerformance.model_construct(score=0, greeting_proper=False, empathy_shown=False, issue_resolved=False, call_outcome="", strengths=[], improvements=[]),
@@ -330,10 +352,85 @@ async def analyze_text(conversation_id: str, client_id: str, transcript: str, cl
             error=str(e),
             processing_time_ms=int((time.time() - start_time) * 1000),
             summary="", language_detected="", languages_all=[],
-             sentiment=SentimentAnalysis.model_construct(overall="", customer_sentiment="", agent_sentiment="", emotional_arc=[], frustration_detected=False),
-             customer_intents=[], topics_discussed=[],
+             sentiment=SentimentAnalysis.model_construct(overall="", sentiment_score=0.0, customer_sentiment="", agent_sentiment="", emotional_arc=[], frustration_detected=False),
+             primary_intent="general_inquiry", secondary_intents=[], topics_discussed=[],
              entities=EntityExtraction.model_construct(amounts_mentioned=[], dates_mentioned=[], account_references=[], products_mentioned=[], locations_mentioned=[], people_mentioned=[]),
              compliance=ComplianceCheck.model_construct(violations_detected=[], policies_checked=[], risk_level="", escalation_required=False, risk_flags=[]),
              agent_performance=AgentPerformance.model_construct(score=0, greeting_proper=False, empathy_shown=False, issue_resolved=False, call_outcome="", strengths=[], improvements=[]),
              rag_policies_used=rag_policies
         )
+
+
+def analyze_text_sync(transcript: str, client_config: dict) -> dict:
+    """
+    Standalone synchronous function for text analysis.
+    
+    This is the simple interface your teammates can call directly.
+    Takes a raw transcript string and client config dict.
+    Returns a plain Python dict — no Pydantic, no async needed.
+    
+    Args:
+        transcript:    Full conversation text string
+                       Format: "Agent: ...\nCustomer: ..."
+        client_config: Client domain config dict. Must have:
+                       - domain (str): "banking", "telecom", etc.
+                       - products (list): list of product names
+                       - risk_triggers (list): list of risk keywords
+    
+    Returns:
+        dict with all analysis fields. On error, returns dict with
+        "status": "failed" and "error": "reason"
+    
+    Example:
+        config = {
+            "domain": "banking",
+            "products": ["savings account", "debit card"],
+            "risk_triggers": ["unauthorized transaction", "fraud"]
+        }
+        result = analyze_text_sync(transcript, config)
+        print(result["primary_intent"])       # "dispute_transaction"
+        print(result["sentiment"]["sentiment_score"])  # -0.3
+    """
+    import time
+    
+    start = time.time()
+    
+    # ── Step 1: Build policies list from risk_triggers in config ──
+    domain = client_config.get("domain", "general")
+    risk_triggers = client_config.get("risk_triggers", [])
+    
+    # Convert risk triggers to policy statements for the prompt
+    auto_policies = [
+        f"Monitor and flag any mention of: {', '.join(risk_triggers)}"
+    ] if risk_triggers else []
+    
+    # ── Step 2: Build the analysis prompt ──
+    prompt = _build_analysis_prompt(
+        client_config=client_config,
+        rag_policies=auto_policies,
+        input_type="text",
+        transcript=transcript,
+    )
+    
+    # ── Step 3: Call Gemini ──
+    try:
+        response = model.generate_content(prompt)
+        raw_text = response.text
+        
+        # ── Step 4: Parse JSON from response ──
+        data = json.loads(raw_text)
+        
+        # ── Step 5: Add processing metadata ──
+        data["processing_time_ms"] = int((time.time() - start) * 1000)
+        data["status"] = "completed"
+        data["input_type"] = "text"
+        
+        return data
+        
+    except Exception as e:
+        return {
+            "status": "failed",
+            "error": str(e),
+            "input_type": "text",
+            "processing_time_ms": int((time.time() - start) * 1000),
+        }
