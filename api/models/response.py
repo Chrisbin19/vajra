@@ -6,6 +6,7 @@ from typing import List, Optional
 
 class SentimentAnalysis(BaseModel):
     overall: str = Field(..., description="'positive' | 'negative' | 'neutral' | 'mixed'")
+    sentiment_score: float = Field(default=0.0, ge=-1.0, le=1.0, description="Numeric sentiment score: -1.0 (very negative) to +1.0 (very positive)")
     customer_sentiment: str = Field(..., description="Description of the customer emotional state")
     agent_sentiment: str = Field(..., description="Description of the agent tone")
     emotional_arc: List[str] = Field(..., description="Step-by-step emotional progression, e.g. ['frustrated', 'neutral', 'satisfied']")
@@ -45,7 +46,8 @@ class GeminiAnalysisResponse(BaseModel):
     language_detected: str = Field(..., description="The primary ISO language code of the conversation")
     languages_all: List[str] = Field(..., description="All ISO language codes detected, including code-switching instances")
     sentiment: SentimentAnalysis = Field(..., description="In-depth sentiment and emotional analysis")
-    customer_intents: List[str] = Field(..., description="Primary reasons for the customer's contact, e.g. ['dispute_transaction']")
+    primary_intent: str = Field(..., description="Single main reason customer called")
+    secondary_intents: List[str] = Field(default=[], description="Additional customer requests")
     topics_discussed: List[str] = Field(..., description="Themes over the course of the call, e.g. ['unauthorized_charge']")
     entities: EntityExtraction = Field(..., description="Extracted PII, names, amounts, and locations")
     compliance: ComplianceCheck = Field(..., description="Adherence to client-specific RAG policies")
@@ -75,7 +77,8 @@ class ConversationAnalysisResult(BaseModel):
     language_detected: str = Field(..., description="The primary ISO language code of the conversation")
     languages_all: List[str] = Field(..., description="All ISO language codes detected, including code-switching instances")
     sentiment: SentimentAnalysis = Field(..., description="In-depth sentiment and emotional analysis")
-    customer_intents: List[str] = Field(..., description="Primary reasons for the customer's contact, e.g. ['dispute_transaction']")
+    primary_intent: str = Field(..., description="Single main reason customer called")
+    secondary_intents: List[str] = Field(default=[], description="Additional customer requests")
     topics_discussed: List[str] = Field(..., description="Themes over the course of the call, e.g. ['unauthorized_charge']")
     entities: EntityExtraction = Field(..., description="Extracted PII, names, amounts, and locations")
 
@@ -102,12 +105,14 @@ class ConversationAnalysisResult(BaseModel):
                 "languages_all": ["en"],
                 "sentiment": {
                     "overall": "mixed",
+                    "sentiment_score": -0.2,
                     "customer_sentiment": "worried but relieved at the end",
                     "agent_sentiment": "professional and empathetic",
                     "emotional_arc": ["worried", "neutral", "relieved"],
                     "frustration_detected": False
                 },
-                "customer_intents": ["report_fraud", "block_card"],
+                "primary_intent": "report_fraud",
+                "secondary_intents": ["block_card"],
                 "topics_discussed": ["unauthorized_transaction", "card_blocking", "dispute_resolution"],
                 "entities": {
                     "amounts_mentioned": ["Rs.4200"],
