@@ -84,3 +84,18 @@ class ErrorResponse(BaseModel):
     error: str = Field(..., description="High level error type")
     detail: str = Field(..., description="Detailed error description")
     conversation_id: Optional[str] = Field(None, description="UUID involved in error if available")
+
+
+class JsonRagRequest(BaseModel):
+    """
+    Request model for Phase 3: feeding generated Phase 2 JSON back into RAG.
+    """
+    client_id: str = Field(
+        ...,
+        description="Client identifier — used to fetch domain rules and configs",
+        json_schema_extra={"example": "banking"}
+    )
+    analysis_data: dict = Field(
+        ...,
+        description="The full JSON dictionary output generated from Phase 2 (ConversationAnalysisResult format)."
+    )

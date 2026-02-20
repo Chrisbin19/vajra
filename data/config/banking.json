@@ -1,0 +1,5 @@
+{
+  "business_domain": "banking",
+  "products_services": ["Credit Cards", "Savings Accounts"],
+  "policies": ["Must verify user identity before discussing account details."]
+}

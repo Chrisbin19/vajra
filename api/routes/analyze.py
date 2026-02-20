@@ -17,61 +17,42 @@ TEMP_AUDIO_DIR = "temp_audio"
 os.makedirs(TEMP_AUDIO_DIR, exist_ok=True)
 
 
+import json
+
 def _get_client_config(client_id: str) -> dict:
     """
-    Returns client domain config. 
-    Phase 3 replaces this with a real SQLite query.
+    Returns client domain config from JSON file (migrated from transight).
     """
-    configs = {
-        "banking_client_01": {
-            "domain": "banking",
-            "company_name": "State Bank",
-            "products": ["savings account", "credit card", "debit card", "personal loan"],
-            "risk_triggers": ["unauthorized transaction", "fraud", "OTP shared", "large transfer"],
-            "escalation_threshold": "high",
-        },
-        "telecom_client_01": {
-            "domain": "telecom", 
-            "company_name": "Airtel",
-            "products": ["prepaid", "postpaid", "broadband", "DTH"],
-            "risk_triggers": ["SIM swap", "billing dispute", "service outage"],
+    config_path = os.path.join("data", "config", f"{client_id}.json")
+    try:
+        with open(config_path, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        # Default fallback if explicit config is not found
+        return {
+            "domain": "customer support",
+            "company_name": client_id,
+            "products": [],
+            "risk_triggers": ["fraud", "escalation", "complaint"],
             "escalation_threshold": "medium",
         }
-    }
-    return configs.get(client_id, {
-        "domain": "customer support",
-        "company_name": client_id,
-        "products": [],
-        "risk_triggers": ["fraud", "escalation", "complaint"],
-        "escalation_threshold": "medium",
-    })
 
 
 def _get_rag_policies(client_id: str) -> list[str]:
     """
-    Returns compliance policies for the client.
-    Phase 3 replaces this with a real ChromaDB query.
+    Returns compliance policies for the client from txt file (migrated from transight).
     """
-    banking_policies = [
-        "Identity Verification: Verify customer with account number + OTP before sharing account details.",
-        "Call Recording Disclosure: Inform customer about call recording within first 30 seconds.",
-        "Fraud Dispute SLA: Escalate unauthorized transaction disputes above Rs.10,000 within 24 hours.",
-        "Card Blocking Protocol: Offer immediate card blocking for unauthorized transaction reports.",
-        "Data Privacy: Never read full account numbers over phone — only last 4 digits.",
-        "Chargeback Policy: Customer has 30 days from transaction to raise dispute.",
-        "Empathy Requirement: Acknowledge frustration and apologize before technical resolution.",
-    ]
-    telecom_policies = [
-        "SIM Swap Verification: Require 3 forms of ID for SIM swap requests.",
-        "Billing Dispute SLA: Acknowledge within 24 hours, resolve within 7 days.",
-        "Outage Communication: Proactively inform of known outages and ETA.",
-    ]
-    if "banking" in client_id.lower():
-        return banking_policies
-    elif "telecom" in client_id.lower():
-        return telecom_policies
-    return ["Always acknowledge customer concern before providing solutions.",
-            "Escalate unresolved issues after 10 minutes to supervisor."]
+    rules_path = os.path.join("data", "domain_knowledge", f"{client_id}_rules.txt")
+    try:
+        with open(rules_path, 'r') as f:
+            content = f.read()
+            # Split by newlines and filter out empty strings
+            return [line.strip() for line in content.split('\n') if line.strip()]
+    except FileNotFoundError:
+        return [
+            "Always acknowledge customer concern before providing solutions.",
+            "Escalate unresolved issues after 10 minutes to supervisor."
+        ]
 
 
 def _validate_audio_file(filename: str, file_size: int) -> str:
@@ -155,6 +136,16 @@ async def analyze_audio(
     if result.status == "failed":
         raise HTTPException(status_code=500, detail=f"Analysis failed: {result.error}")
         
+    # ── Step 7: Trigger Phase 3 RAG automatically ──
+    print(f"[Phase 3][{conversation_id}] Automatically feeding Phase 2 JSON into Phase 3 RAG...")
+    rag_actions = await gemini_service.analyze_json_for_rag(
+        client_id=client_id_stripped,
+        analysis_json=result.model_dump(),
+        client_config=client_config,
+        rag_policies=rag_policies
+    )
+    result.rag_actions = rag_actions
+    
     return result
 
 
@@ -186,7 +177,59 @@ async def analyze_text(request: TextAnalysisRequest):
         rag_policies=rag_policies,
     )
     
+    
     if result.status == "failed":
         raise HTTPException(status_code=500, detail=f"Analysis failed: {result.error}")
         
+    # ── Step 3: Trigger Phase 3 RAG automatically ──
+    print(f"[Phase 3][{conversation_id}] Automatically feeding Phase 2 JSON into Phase 3 RAG...")
+    rag_actions = await gemini_service.analyze_json_for_rag(
+        client_id=client_id_stripped,
+        analysis_json=result.model_dump(),
+        client_config=client_config,
+        rag_policies=rag_policies
+    )
+    result.rag_actions = rag_actions
+        
     return result
+
+
+from api.models.request import JsonRagRequest
+
+@router.post(
+    "/analyze/json_rag",
+    status_code=200,
+    summary="Process Phase 2 JSON output through Phase 3 RAG",
+    description="Accepts the JSON output from a previous analysis and feeds it into the RAG system to generate a final recommendation based on domain rules."
+)
+async def analyze_json_rag(request: JsonRagRequest):
+    """
+    Endpoint handling JSON transcript submissions for Phase 3 RAG analysis.
+    """
+    client_id_stripped = request.client_id.strip()
+    
+    print(f"\n{'='*50}")
+    print(f"[Phase 3] Starting Post-Analysis RAG for client: {client_id_stripped}")
+    
+    # Load domain config and rules
+    client_config = _get_client_config(client_id_stripped)
+    rag_policies = _get_rag_policies(client_id_stripped)
+    
+    # Call the new gemini service function
+    result = await gemini_service.analyze_json_for_rag(
+        client_id=client_id_stripped,
+        analysis_json=request.analysis_data,
+        client_config=client_config,
+        rag_policies=rag_policies
+    )
+    
+    # If the service returns the fallback error string, raise a 500
+    if result.startswith("Phase 3 RAG Analysis Failed:"):
+        raise HTTPException(status_code=500, detail=result)
+        
+    # Return the raw dict
+    return {
+        "status": "success",
+        "client_id": client_id_stripped,
+        "rag_actions": result.model_dump() if result else None
+    }

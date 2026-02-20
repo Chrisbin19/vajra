@@ -52,6 +52,13 @@ class GeminiAnalysisResponse(BaseModel):
     agent_performance: AgentPerformance = Field(..., description="Coaching and resolution metrics for the agent")
     speakers: SpeakerInfo = Field(..., description="Speaker diarization and tracking")
 
+class RagActions(BaseModel):
+    suggested_actions: List[str] = Field(..., description="A list of specific, actionable next steps for human agents or automated systems.")
+    priority: str = Field(..., description="The priority derived from the RAG analysis (e.g., 'P1 - Critical', 'P2 - High', 'P3 - Nominal').")
+    policy_justifications: List[str] = Field(..., description="Specific quotes or reasoning linking the suggested_actions back to the client's established RAG policies.")
+    human_review_needed: bool = Field(..., description="True if the situation outlined in the exact rules requires manual intervention or review.")
+    coaching_notes: str = Field(..., description="Brief advice or constructive feedback for the agent who handled this conversation.")
+
 class ConversationAnalysisResult(BaseModel):
     """
     Main response wrapper for Phase 2 containing all extracted intelligence.
@@ -79,6 +86,7 @@ class ConversationAnalysisResult(BaseModel):
     # Bonus / Meta
     speakers: Optional[SpeakerInfo] = Field(None, description="Speaker diarization and tracking")
     rag_policies_used: List[str] = Field(..., description="The specific policies passed into the prompt for transparency")
+    rag_actions: Optional[RagActions] = Field(None, description="Structured action plan generated from feeding Phase 2 data back into the RAG Pipeline (Phase 3).")
     error: Optional[str] = Field(None, description="Populated only if status == 'failed'")
 
     model_config = {

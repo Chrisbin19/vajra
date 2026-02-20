@@ -337,3 +337,75 @@ async def analyze_text(conversation_id: str, client_id: str, transcript: str, cl
              agent_performance=AgentPerformance.model_construct(score=0, greeting_proper=False, empathy_shown=False, issue_resolved=False, call_outcome="", strengths=[], improvements=[]),
              rag_policies_used=rag_policies
         )
+
+
+from api.models.response import RagActions
+from typing import Optional
+
+async def analyze_json_for_rag(client_id: str, analysis_json: dict, client_config: dict, rag_policies: list[str]) -> Optional[RagActions]:
+    """
+    End-to-end RAG pipeline using the JSON output from Phase 2.
+    """
+    start_time = time.time()
+    try:
+        print(f"[Phase 3] Building RAG prompt for client {client_id}...")
+        
+        prompt = f"""You are a senior compliance and quality assurance AI for an enterprise customer support center.
+        You are reviewing the detailed JSON analysis of a customer support conversation.
+
+        ### 1. Client Domain Context
+        - Domain: {client_config.get('domain', 'Unknown')}
+        - Company Name: {client_config.get('company_name', 'Unknown')}
+        - Supported Products: {", ".join(client_config.get('products', []))}
+        - Known Risk Triggers for this client: {", ".join(client_config.get('risk_triggers', []))}
+        - Escalation Threshold: {client_config.get('escalation_threshold', 'medium')}
+
+        ### 2. RAG Policies
+        You must base your final recommendation strictly on these compliance policies:
+        """
+        for i, policy in enumerate(rag_policies, 1):
+            prompt += f"{i}. {policy}\n"
+
+        prompt += f"""
+        ### 3. Conversation Analysis Data (JSON format)
+        {json.dumps(analysis_json, indent=2)}
+
+        ### 4. Output Instruction
+        Based on the provided analysis data and the strict compliance policies, generate a highly structured action plan.
+        Make sure the 'policy_justifications' explicitly directly quote or refer to the numbered rules above.
+        """
+
+        print(f"[Phase 3] Requesting Gemini generation (Structured JSON Mode)...")
+        # Use the standard structured JSON configuration
+        structured_model = genai.GenerativeModel(
+            model_name=MODEL_NAME,
+            generation_config=genai.GenerationConfig(
+                response_mime_type="application/json",
+                response_schema=RagActions,
+                temperature=0.2, # Lower temp for more analytical rule-following
+            )
+        )
+        response = structured_model.generate_content(prompt)
+        
+        processing_time = int((time.time() - start_time) * 1000)
+        print(f"[Phase 3] RAG Analysis Complete in {processing_time}ms.")
+        print("-" * 50)
+        print("RAW GEMINI OUTPUT (PHASE 3 RAG JSON):")
+        print(response.text)
+        print("-" * 50)
+        
+        # Parse and return as dict to be easily serialized by Pydantic
+        parsed_dict = json.loads(response.text)
+        return RagActions(**parsed_dict)
+
+    except Exception as e:
+        print(f"[Phase 3] ERROR: {str(e)}")
+        # Safe fallback
+        return RagActions.model_construct(
+            suggested_actions=[],
+            priority="Unknown",
+            policy_justifications=[f"Analysis failed: {str(e)}"],
+            human_review_needed=True,
+            coaching_notes="N/A"
+        )
+
