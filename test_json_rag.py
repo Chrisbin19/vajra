@@ -15,6 +15,7 @@ sample_payload = {
   ],
   "sentiment": {
     "overall": "negative",
+    "sentiment_score": -0.8,
     "customer_sentiment": "Extremely negative and frustrated, demanding immediate escalation.",
     "agent_sentiment": "Neutral, attempting to be helpful but cut off.",
     "emotional_arc": [
@@ -24,8 +25,8 @@ sample_payload = {
     ],
     "frustration_detected": True
   },
-  "customer_intents": [
-    "demand_supervisor",
+  "primary_intent": "demand_supervisor",
+  "secondary_intents": [
     "express_frustration"
   ],
   "topics_discussed": [
@@ -95,7 +96,7 @@ response = requests.post("http://127.0.0.1:8000/api/v1/analyze/json_rag", json=r
 
 if response.status_code == 200:
     print("\nSUCCESS!")
-    print(response.json().get('rag_recommendation'))
+    print(json.dumps(response.json().get('rag_actions'), indent=2))
 else:
     print(f"\nFAILED: {response.status_code}")
     print(response.text)

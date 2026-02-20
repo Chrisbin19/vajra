@@ -100,10 +100,20 @@ if __name__ == "__main__":
             result = analyze_text(text)
             
             print("\n" + "="*40)
-            print("API RESPONSE:")
-            print(json.dumps(result, indent=2))
-            if result.get("language_detected"):
-                print(f"\n💡 Detected Language Hint: '{result.get('language_detected')}'")
+            print("API RESPONSE (PHASE 2 JSON):")
+            
+            # Make a copy to print Phase 2 separately
+            import copy
+            phase2 = copy.deepcopy(result)
+            rag_data = phase2.pop('rag_actions', None)
+            
+            print(json.dumps(phase2, indent=2))
+            
+            if rag_data:
+                print("\n" + "="*40)
+                print("PHASE 3: ACTIONABLE RAG REPORT:")
+                print(json.dumps(rag_data, indent=2))
+                
             print("="*40)
             
         elif choice == '2':
@@ -115,8 +125,19 @@ if __name__ == "__main__":
             result = analyze_audio(filepath)
             
             print("\n" + "="*40)
-            print("API RESPONSE:")
-            print(json.dumps(result, indent=2))
+            print("API RESPONSE (PHASE 2 JSON):")
+            
+            import copy
+            phase2 = copy.deepcopy(result)
+            rag_data = phase2.pop('rag_actions', None)
+            
+            print(json.dumps(phase2, indent=2))
+            
+            if rag_data:
+                print("\n" + "="*40)
+                print("PHASE 3: ACTIONABLE RAG REPORT:")
+                print(json.dumps(rag_data, indent=2))
+                
             print("="*40)
             
         elif choice == '3':

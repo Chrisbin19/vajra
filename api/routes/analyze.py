@@ -223,10 +223,6 @@ async def analyze_json_rag(request: JsonRagRequest):
         rag_policies=rag_policies
     )
     
-    # If the service returns the fallback error string, raise a 500
-    if result.startswith("Phase 3 RAG Analysis Failed:"):
-        raise HTTPException(status_code=500, detail=result)
-        
     # Return the raw dict
     return {
         "status": "success",
