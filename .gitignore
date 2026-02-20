@@ -1,0 +1,39 @@
+# Environment variables
+.env
+.env.*
+
+# Python caches and artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+env.bak/
+venv.bak/
+.venv
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+test_logs_*.txt
+
+# Project specific temporary folders
+temp_audio/
+temp_video/
+
+# IDE files
+.vscode/
+.idea/
+
+# Testing and coverage
+.coverage
+.tox/
+.pytest_cache/
+htmlcov/
+
+# OS generated
+.DS_Store
+Thumbs.db

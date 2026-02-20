@@ -1,0 +1,76 @@
+=== TEST 1: Health Check ===
+{
+  "status": "healthy",
+  "service": "VAJRA Conversation Intelligence",
+  "model": "gemini-2.5-flash",
+  "version": "1.0.0",
+  "supported_inputs": [
+    "audio/mp3",
+    "audio/wav",
+    "audio/ogg",
+    "audio/m4a",
+    "text/plain"
+  ]
+}
+
+=== TEST 2: Text Input (English) ===
+{
+  "conversation_id": "418bcf09-5a95-4a6f-b53c-726e04a9338f",
+  "client_id": "banking_client_01",
+  "input_type": "text",
+  "status": "received",
+  "language_detected": "en",
+  "file_info": null,
+  "message": "Transcript received. Length: 117 characters. Language hint: 'en' (Gemini will confirm). Analysis queued for conversation_id: 418bcf09-5a95-4a6f-b53c-726e04a9338f"
+}
+
+=== TEST 3: Text Input (Hindi) ===
+{
+  "conversation_id": "6d3bbc2b-241f-4248-8173-74dd4495f61d",
+  "client_id": "banking_client_01",
+  "input_type": "text",
+  "status": "received",
+  "language_detected": "hi",
+  "file_info": null,
+  "message": "Transcript received. Length: 84 characters. Language hint: 'hi' (Gemini will confirm). Analysis queued for conversation_id: 6d3bbc2b-241f-4248-8173-74dd4495f61d"
+}
+
+=== TEST 4: Audio Input ===
+{
+  "conversation_id": "02db802e-adc1-41e0-8a8e-c6993bf820e4",
+  "client_id": "banking_client_01",
+  "input_type": "audio",
+  "status": "received",
+  "language_detected": null,
+  "file_info": {
+    "filename": "sample_call.mp3",
+    "size_bytes": 25,
+    "size_mb": 0.0,
+    "format": ".mp3",
+    "temp_path": "temp_audio\\02db802e-adc1-41e0-8a8e-c6993bf820e4.mp3"
+  },
+  "message": "Audio file 'sample_call.mp3' received. Size: 0.00MB. Gemini analysis queued for conversation_id: 02db802e-adc1-41e0-8a8e-c6993bf820e4"
+}
+
+=== TEST 5: Reject Invalid File Type ===
+{
+  "detail": "Unsupported file type: '.pdf'. Allowed formats: ['.aac', '.flac', '.m4a', '.mp3', '.ogg', '.wav', '.webm']"
+}
+
+=== TEST 6: Reject Empty Transcript ===
+{
+  "detail": [
+    {
+      "type": "string_too_short",
+      "loc": [
+        "body",
+        "transcript"
+      ],
+      "msg": "String should have at least 10 characters",
+      "input": "hi",
+      "ctx": {
+        "min_length": 10
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+aiofiles
+python-dotenv
+google-generativeai
+chromadb
+sentence-transformers
+sqlalchemy
