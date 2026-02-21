@@ -1,10 +1,10 @@
-# VAJRA — Conversation Intelligence API
+# NEXUS — Conversation Intelligence API
 
 Enterprise backend that analyzes customer support conversations (voice and text) using a two-layer compliance engine — deterministic keyword matching plus Gemini 2.5 Flash contextual reasoning — and returns structured JSON intelligence consumable by any frontend, mobile app, or dashboard.
 
 ## Overview
 
-VAJRA is a domain-agnostic conversation intelligence API built for regulated industries. It accepts raw audio recordings or text transcripts, runs them through a hybrid AI + deterministic compliance pipeline, and returns a single structured JSON response covering sentiment analysis, entity extraction, compliance violations, agent performance scoring, and actionable recommendations. The system is configured entirely through JSON files — banking, insurance, telecom, or any new industry can be onboarded without code changes. Built with FastAPI and Google Gemini 2.5 Flash.
+NEXUS is a domain-agnostic conversation intelligence API built for regulated industries. It accepts raw audio recordings or text transcripts, runs them through a hybrid AI + deterministic compliance pipeline, and returns a single structured JSON response covering sentiment analysis, entity extraction, compliance violations, agent performance scoring, and actionable recommendations. The system is configured entirely through JSON files — banking, insurance, telecom, or any new industry can be onboarded without code changes. Built with FastAPI and Google Gemini 2.5 Flash.
 
 ## Architecture
 
@@ -46,7 +46,7 @@ Request (audio/text + client_id)
 
 ## AI Approach
 
-VAJRA uses a **two-layer compliance system** designed for auditability in regulated environments:
+NEXUS uses a **two-layer compliance system** designed for auditability in regulated environments:
 
 ### Layer 1 — Deterministic Keyword Engine (`core/compliance.py`)
 - Scans raw transcript against configurable high-risk keywords
@@ -126,7 +126,7 @@ Health check. Returns:
 ```json
 {
   "status": "healthy",
-  "service": "VAJRA Conversation Intelligence",
+  "service": "NEXUS Conversation Intelligence",
   "model": "gemini-2.5-flash",
   "version": "1.0.0"
 }
@@ -159,7 +159,7 @@ Mis-selling Guidelines: Agents must disclose all risks, charges, and the free lo
 
 **Step 3** — Call the API with `"client_id": "yourdomain"`. Done.
 
-If a `client_id` has no matching config, VAJRA falls back to a universal default configuration with generic risk triggers (`fraud`, `escalation`, `complaint`).
+If a `client_id` has no matching config, NEXUS falls back to a universal default configuration with generic risk triggers (`fraud`, `escalation`, `complaint`).
 
 ## Demo Transcript Files
 
@@ -189,7 +189,7 @@ GEMINI_API_KEY=your_google_ai_studio_key
 
 ## Sample Output
 
-Real output from VAJRA analyzing a banking fraud call:
+Real output from NEXUS analyzing a banking fraud call:
 ```json
 {
   "conversation_id": "551c717f-5ba4-4a06-86fc-677cdcbf3968",
@@ -263,7 +263,7 @@ Real output from VAJRA analyzing a banking fraud call:
 ## Project Structure
 
 ```
-vajra/
+nexus/
 ├── main.py                        # Entry point + launch menu
 ├── requirements.txt               # Dependencies
 ├── .env                           # GEMINI_API_KEY
