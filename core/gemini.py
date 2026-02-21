@@ -31,6 +31,7 @@ if not api_key:
     print("WARNING: GEMINI_API_KEY is not set in .env file.")
 
 client = genai.Client(api_key=api_key)
+MODEL_NAME = "gemini-2.5-flash"
 
 
 def _build_analysis_prompt(
