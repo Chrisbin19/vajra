@@ -6,7 +6,8 @@ import uuid
 import aiofiles
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
 from api.models.request import TextAnalysisRequest
-from api.models.response import ConversationAnalysisResult
+from api.models.response import ConversationAnalysisResult, DeterministicCompliance
+from core.compliance import apply_compliance_triggers
 import core.gemini as gemini_service
 
 router = APIRouter()
@@ -136,6 +137,16 @@ async def analyze_audio(
     if result.status == "failed":
         raise HTTPException(status_code=500, detail=f"Analysis failed: {result.error}")
         
+    # ── Phase 4: Deterministic + AI-Hybrid Compliance ──────────────────────
+    print(f"[Phase 4][{conversation_id}] Running hybrid compliance engine...")
+    if result.transcript:
+        flags_data = apply_compliance_triggers(
+            result.transcript,
+            client_config,
+            ai_result=result.model_dump(),   # ← hybrid fallback
+        )
+        result.deterministic_compliance = DeterministicCompliance(**flags_data)
+        
     # ── Step 7: Trigger Phase 3 RAG automatically ──
     print(f"[Phase 3][{conversation_id}] Automatically feeding Phase 2 JSON into Phase 3 RAG...")
     rag_actions = await gemini_service.analyze_json_for_rag(
@@ -180,6 +191,17 @@ async def analyze_text(request: TextAnalysisRequest):
     
     if result.status == "failed":
         raise HTTPException(status_code=500, detail=f"Analysis failed: {result.error}")
+        
+    # ── Phase 4: Deterministic + AI-Hybrid Compliance ──────────────────────
+    print(f"[Phase 4][{conversation_id}] Running hybrid compliance engine...")
+    transcript_to_check = result.transcript or request.transcript
+    if transcript_to_check:
+        flags_data = apply_compliance_triggers(
+            transcript_to_check,
+            client_config,
+            ai_result=result.model_dump(),   # ← hybrid fallback
+        )
+        result.deterministic_compliance = DeterministicCompliance(**flags_data)
         
     # ── Step 3: Trigger Phase 3 RAG automatically ──
     print(f"[Phase 3][{conversation_id}] Automatically feeding Phase 2 JSON into Phase 3 RAG...")

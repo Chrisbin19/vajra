@@ -5,7 +5,8 @@ import os
 import json
 import time
 import re
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 from api.models.response import (
     ConversationAnalysisResult,
@@ -23,18 +24,9 @@ api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
     print("WARNING: GEMINI_API_KEY is not set in environment or .env file.")
 
-genai.configure(api_key=api_key)
+client = genai.Client(api_key=api_key)
 
 MODEL_NAME = "gemini-2.5-flash"
-model = genai.GenerativeModel(
-    model_name=MODEL_NAME,
-    generation_config={
-        "temperature": 0.1,
-        "top_p": 0.8,
-        "max_output_tokens": 4096,
-        "response_mime_type": "application/json"
-    }
-)
 
 def _build_analysis_prompt(client_config: dict, rag_policies: list[str], input_type: str, transcript: str = None) -> str:
     """
@@ -87,6 +79,7 @@ INTENT EXTRACTION RULES:
 
 Your JSON must match this exact schema:
 {
+    "transcript": "string (the full, verbatim transcript of the conversation)",
     "summary": "string (2-4 sentences describing the full conversation)",
     "language_detected": "string (primary ISO code, e.g. en, hi)",
     "languages_all": ["string"],
@@ -161,7 +154,7 @@ def _upload_audio_to_gemini(audio_path: str):
     filename_only = os.path.basename(audio_path)
     
     print(f"Uploading {filename_only} to Gemini as {mime_type}...")
-    gemini_file = genai.upload_file(path=audio_path, mime_type=mime_type, display_name=filename_only)
+    gemini_file = client.files.upload(file=audio_path, config=types.UploadFileConfig(mime_type=mime_type, display_name=filename_only))
     print(f"Uploaded successfully. URI: {gemini_file.uri}")
     
     
@@ -247,6 +240,7 @@ def _build_result_from_dict(
         agent_performance=agent_performance,
         speakers=speakers,
         rag_policies_used=rag_policies_used,
+        transcript=data.get("transcript", ""),
         error=None
     )
 
@@ -267,7 +261,16 @@ async def analyze_audio(conversation_id: str, client_id: str, audio_path: str, c
         
         # ── 3. Generate ──
         print(f"[Phase 2][{conversation_id}] Requesting Gemini generation...")
-        response = model.generate_content([gemini_file, prompt])
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=[gemini_file, prompt],
+            config=types.GenerateContentConfig(
+                temperature=0.1,
+                top_p=0.8,
+                max_output_tokens=4096,
+                response_mime_type="application/json"
+            )
+        )
         
         # ── 4. Extract JSON ──
         print(f"[Phase 2][{conversation_id}] Parsing Strict JSON schema response...")
@@ -285,7 +288,7 @@ async def analyze_audio(conversation_id: str, client_id: str, audio_path: str, c
         print(f"[Phase 2][{conversation_id}] Deleting temp audio file {audio_path}...")
         try:
             os.remove(audio_path)
-            genai.delete_file(gemini_file.name)
+            client.files.delete(name=gemini_file.name)
         except Exception as cleanup_err:
             print(f"[Phase 2][{conversation_id}] Cleanup warning: {cleanup_err}")
             
@@ -308,7 +311,8 @@ async def analyze_audio(conversation_id: str, client_id: str, audio_path: str, c
              entities=EntityExtraction.model_construct(amounts_mentioned=[], dates_mentioned=[], account_references=[], products_mentioned=[], locations_mentioned=[], people_mentioned=[]),
              compliance=ComplianceCheck.model_construct(violations_detected=[], policies_checked=[], risk_level="", escalation_required=False, risk_flags=[]),
              agent_performance=AgentPerformance.model_construct(score=0, greeting_proper=False, empathy_shown=False, issue_resolved=False, call_outcome="", strengths=[], improvements=[]),
-             rag_policies_used=rag_policies
+             rag_policies_used=rag_policies,
+             transcript=""
         )
 
 
@@ -324,7 +328,16 @@ async def analyze_text(conversation_id: str, client_id: str, transcript: str, cl
         
         # ── 2. Generate ──
         print(f"[Phase 2][{conversation_id}] Requesting Gemini generation...")
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.1,
+                top_p=0.8,
+                max_output_tokens=4096,
+                response_mime_type="application/json"
+            )
+        )
         
         # ── 3. Extract JSON ──
         print(f"[Phase 2][{conversation_id}] Parsing Strict JSON schema response...")
@@ -357,7 +370,8 @@ async def analyze_text(conversation_id: str, client_id: str, transcript: str, cl
              entities=EntityExtraction.model_construct(amounts_mentioned=[], dates_mentioned=[], account_references=[], products_mentioned=[], locations_mentioned=[], people_mentioned=[]),
              compliance=ComplianceCheck.model_construct(violations_detected=[], policies_checked=[], risk_level="", escalation_required=False, risk_flags=[]),
              agent_performance=AgentPerformance.model_construct(score=0, greeting_proper=False, empathy_shown=False, issue_resolved=False, call_outcome="", strengths=[], improvements=[]),
-             rag_policies_used=rag_policies
+             rag_policies_used=rag_policies,
+             transcript=""
         )
 
 
@@ -399,15 +413,15 @@ async def analyze_json_for_rag(client_id: str, analysis_json: dict, client_confi
 
         print(f"[Phase 3] Requesting Gemini generation (Structured JSON Mode)...")
         # Use the standard structured JSON configuration
-        structured_model = genai.GenerativeModel(
-            model_name=MODEL_NAME,
-            generation_config=genai.GenerationConfig(
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+            config=types.GenerateContentConfig(
                 response_mime_type="application/json",
                 response_schema=RagActions,
                 temperature=0.2, # Lower temp for more analytical rule-following
             )
         )
-        response = structured_model.generate_content(prompt)
         
         processing_time = int((time.time() - start_time) * 1000)
         print(f"[Phase 3] RAG Analysis Complete in {processing_time}ms.")

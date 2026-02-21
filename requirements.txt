@@ -4,7 +4,7 @@ python-multipart
 pydantic
 aiofiles
 python-dotenv
-google-generativeai
+google-genai
 chromadb
 sentence-transformers
 sqlalchemy

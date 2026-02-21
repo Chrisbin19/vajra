@@ -1,0 +1,121 @@
+{
+    "business_domain": "insurance",
+    "company_name": "VAJRA Insurance Client",
+    "products_services": [
+        "Life Insurance",
+        "Health Insurance",
+        "Vehicle Insurance",
+        "Property Insurance"
+    ],
+    "policies": [
+        "All policy terms must be fully disclosed before sale.",
+        "No mis-selling: agent must not mislead on coverage or exclusions.",
+        "Any claim denial must be explained with written justification.",
+        "IRDAI regulations must be followed for all policy servicing."
+    ],
+    "escalation_threshold": "medium",
+    "escalation_rules": {
+        "high_risk_keywords": [
+            {
+                "keyword": "lawsuit",
+                "severity": "high",
+                "policy_reference": "Legal Escalation — IRDAI Grievance Policy"
+            },
+            {
+                "keyword": "lawyer",
+                "severity": "high",
+                "policy_reference": "Legal Escalation — IRDAI Grievance Policy"
+            },
+            {
+                "keyword": "legal action",
+                "severity": "high",
+                "policy_reference": "Legal Escalation — IRDAI Grievance Policy"
+            },
+            {
+                "keyword": "sue",
+                "severity": "high",
+                "policy_reference": "Legal Escalation — IRDAI Grievance Policy"
+            },
+            {
+                "keyword": "court",
+                "severity": "high",
+                "policy_reference": "Legal Escalation — IRDAI Grievance Policy"
+            },
+            {
+                "keyword": "irdai",
+                "severity": "high",
+                "policy_reference": "Regulatory Complaint — IRDAI Sec 14"
+            },
+            {
+                "keyword": "ombudsman",
+                "severity": "high",
+                "policy_reference": "Insurance Ombudsman Rules 2017"
+            },
+            {
+                "keyword": "mis-selling",
+                "severity": "high",
+                "policy_reference": "Anti Mis-selling Policy — IRDAI Circular 2019"
+            },
+            {
+                "keyword": "misselling",
+                "severity": "high",
+                "policy_reference": "Anti Mis-selling Policy — IRDAI Circular 2019"
+            },
+            {
+                "keyword": "fraud",
+                "severity": "high",
+                "policy_reference": "Insurance Fraud Prevention Policy"
+            },
+            {
+                "keyword": "false claim",
+                "severity": "high",
+                "policy_reference": "Claims Integrity Policy — Sec 3.1"
+            },
+            {
+                "keyword": "denied",
+                "severity": "medium",
+                "policy_reference": "Claim Denial Justification Policy"
+            },
+            {
+                "keyword": "rejected",
+                "severity": "medium",
+                "policy_reference": "Claim Rejection Handling — Sec 5.2"
+            },
+            {
+                "keyword": "claim",
+                "severity": "low",
+                "policy_reference": "Claims Processing Policy"
+            },
+            {
+                "keyword": "premium",
+                "severity": "low",
+                "policy_reference": "Premium Dispute Policy"
+            },
+            {
+                "keyword": "lapse",
+                "severity": "medium",
+                "policy_reference": "Policy Lapse Reactivation — Sec 6.1"
+            },
+            {
+                "keyword": "surrender",
+                "severity": "medium",
+                "policy_reference": "Policy Surrender Policy — Sec 7.2"
+            },
+            {
+                "keyword": "supervisor",
+                "severity": "medium",
+                "policy_reference": "Escalation Request Policy"
+            },
+            {
+                "keyword": "complaint",
+                "severity": "medium",
+                "policy_reference": "Grievance Redressal Policy — IRDAI"
+            },
+            {
+                "keyword": "cancel",
+                "severity": "low",
+                "policy_reference": "Policy Cancellation Procedure"
+            }
+        ]
+    }
+}

@@ -1,0 +1,123 @@
+{
+  "conversation_id": "f9d24fdf-d02b-4caa-88d9-51e20e3901b6",
+  "client_id": "banking",
+  "input_type": "text",
+  "status": "completed",
+  "processing_time_ms": 6127,
+  "summary": "The customer initiates the conversation in a highly agitated state, expressing extreme dissatisfaction and demanding to speak with a supervisor immediately. They threaten legal action if their issue is not resolved.",
+  "language_detected": "en",
+  "languages_all": [
+    "en"
+  ],
+  "sentiment": {
+    "overall": "negative",
+    "sentiment_score": -0.9,
+    "customer_sentiment": "Extremely upset, angry, demanding, and threatening.",
+    "agent_sentiment": "N/A",
+    "emotional_arc": [
+      "Starts extremely angry",
+      "Remains extremely angry"
+    ],
+    "frustration_detected": true
+  },
+  "primary_intent": "complaint",
+  "secondary_intents": [
+    "request_supervisor",
+    "threaten_legal_action"
+  ],
+  "topics_discussed": [
+    "customer dissatisfaction",
+    "escalation request",
+    "legal threats"
+  ],
+  "entities": {
+    "amounts_mentioned": [],
+    "dates_mentioned": [],
+    "account_references": [],
+    "products_mentioned": [],
+    "locations_mentioned": [],
+    "people_mentioned": []
+  },
+  "compliance": {
+    "violations_detected": [],
+    "policies_checked": [
+      "PCI-DSS Requirement",
+      "Fraud Triggers"
+    ],
+    "risk_level": "high",
+    "escalation_required": true,
+    "risk_flags": [
+      "customer_dissatisfaction",
+      "threat_of_legal_action",
+      "request_for_supervisor"
+    ]
+  },
+  "agent_performance": {
+    "score": 0,
+    "greeting_proper": false,
+    "empathy_shown": false,
+    "issue_resolved": false,
+    "call_outcome": "escalated",
+    "strengths": [],
+    "improvements": []
+  },
+  "speakers": {
+    "speakers_detected": 1,
+    "speaker_labels": [
+      "Customer"
+    ],
+    "language_per_speaker": {
+      "Customer": "en"
+    }
+  },
+  "transcript": "Hello, I am very upset. I demand to speak to a supervisor now. If this isn't fixed, I will file a lawsuit!",
+  "rag_policies_used": [
+    "PCI-DSS Requirement: Sensitive authentication data cannot be retained.",
+    "Fraud Triggers: Flag any conversation where the customer mentions \"unauthorized transaction\", \"stolen card\", or \"hacked account\"."
+  ],
+  "deterministic_compliance": {
+    "flags": [
+      {
+        "keyword": "lawsuit",
+        "severity": "high",
+        "context": "Hello, I am very upset. I demand to speak to a supervisor now. If this isn't fixed, I will file a lawsuit!",
+        "policy_reference": "Legal Escalation Procedure â€” Sec 4.1",
+        "action_required": true,
+        "source": "deterministic"
+      },
+      {
+        "keyword": "supervisor",
+        "severity": "medium",
+        "context": "Hello, I am very upset. I demand to speak to a supervisor now. If this isn't fixed, I will file a lawsuit!",
+        "policy_reference": "Customer Escalation Request â€” Sec 5.1",
+        "action_required": false,
+        "source": "deterministic"
+      },
+      {
+        "keyword": "demand",
+        "severity": "medium",
+        "context": "Hello, I am very upset. I demand to speak to a supervisor now. If this isn't fixed, I will file a lawsuit!",
+        "policy_reference": "Customer Escalation Policy",
+        "action_required": false,
+        "source": "deterministic"
+      }
+    ],
+    "total_flags": 3,
+    "compliance_risk_score": 0.08,
+    "auto_escalate": true
+  },
+  "rag_actions": {
+    "suggested_actions": [
+      "Immediately escalate the conversation to a supervisor and the legal department for review due to the customer's explicit threat of a lawsuit.",
+      "Ensure all conversation records are securely retained for potential legal proceedings.",
+      "Review agent training on handling legal threats and extreme customer dissatisfaction to ensure proper de-escalation and escalation protocols are followed."
+    ],
+    "priority": "P2 - High",
+    "policy_justifications": [
+      "The suggested actions are not directly mandated by RAG Policy 1: 'PCI-DSS Requirement: Sensitive authentication data cannot be retained' or RAG Policy 2: 'Fraud Triggers: Flag any conversation where the customer mentions \"unauthorized transaction\", \"stolen card\", or \"hacked account\"', as neither of these policies were triggered by the conversation content. No sensitive authentication data was retained, and no fraud keywords were mentioned."
+    ],
+    "human_review_needed": true,
+    "coaching_notes": "The conversation was automatically escalated due to the customer's legal threat and extreme dissatisfaction. While no violations of the specific RAG policies (PCI-DSS, Fraud Triggers) were detected, agents should be trained to identify and immediately escalate conversations involving legal threats or extreme customer dissatisfaction, as per general escalation protocols and the system's auto-escalation flags."
+  },
+  "error": null
+}

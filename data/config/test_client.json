@@ -1,0 +1,124 @@
+{
+    "business_domain": "general_customer_support",
+    "company_name": "VAJRA Test Client",
+    "products_services": [
+        "Generic Product",
+        "Customer Support"
+    ],
+    "policies": [
+        "Acknowledge customer concern before providing solutions.",
+        "Escalate unresolved issues after 10 minutes to supervisor.",
+        "Any legal or abuse threat must be escalated immediately.",
+        "Document all complaints with a ticket reference."
+    ],
+    "escalation_threshold": "medium",
+    "escalation_rules": {
+        "high_risk_keywords": [
+            {
+                "keyword": "lawsuit",
+                "severity": "high",
+                "policy_reference": "Legal Threat Escalation Policy"
+            },
+            {
+                "keyword": "lawyer",
+                "severity": "high",
+                "policy_reference": "Legal Threat Escalation Policy"
+            },
+            {
+                "keyword": "legal action",
+                "severity": "high",
+                "policy_reference": "Legal Threat Escalation Policy"
+            },
+            {
+                "keyword": "sue",
+                "severity": "high",
+                "policy_reference": "Legal Threat Escalation Policy"
+            },
+            {
+                "keyword": "court",
+                "severity": "high",
+                "policy_reference": "Legal Threat Escalation Policy"
+            },
+            {
+                "keyword": "fraud",
+                "severity": "high",
+                "policy_reference": "Fraud Reporting Policy"
+            },
+            {
+                "keyword": "scam",
+                "severity": "high",
+                "policy_reference": "Fraud Reporting Policy"
+            },
+            {
+                "keyword": "stolen",
+                "severity": "high",
+                "policy_reference": "Security Incident Policy"
+            },
+            {
+                "keyword": "unauthorized",
+                "severity": "high",
+                "policy_reference": "Security Incident Policy"
+            },
+            {
+                "keyword": "hacked",
+                "severity": "high",
+                "policy_reference": "Cybersecurity Policy"
+            },
+            {
+                "keyword": "supervisor",
+                "severity": "medium",
+                "policy_reference": "Escalation Request Policy"
+            },
+            {
+                "keyword": "manager",
+                "severity": "medium",
+                "policy_reference": "Escalation Request Policy"
+            },
+            {
+                "keyword": "complaint",
+                "severity": "medium",
+                "policy_reference": "Complaint Handling Policy"
+            },
+            {
+                "keyword": "demand",
+                "severity": "medium",
+                "policy_reference": "Customer Escalation Policy"
+            },
+            {
+                "keyword": "threaten",
+                "severity": "high",
+                "policy_reference": "Abuse & Threat Policy"
+            },
+            {
+                "keyword": "abuse",
+                "severity": "high",
+                "policy_reference": "Abuse & Threat Policy"
+            },
+            {
+                "keyword": "unacceptable",
+                "severity": "low",
+                "policy_reference": "Customer Satisfaction Policy"
+            },
+            {
+                "keyword": "terrible",
+                "severity": "low",
+                "policy_reference": "Customer Satisfaction Policy"
+            },
+            {
+                "keyword": "worst",
+                "severity": "low",
+                "policy_reference": "Customer Satisfaction Policy"
+            },
+            {
+                "keyword": "refund",
+                "severity": "low",
+                "policy_reference": "Refund Processing Policy"
+            },
+            {
+                "keyword": "cancel",
+                "severity": "low",
+                "policy_reference": "Cancellation Policy"
+            }
+        ]
+    }
+}

@@ -4,6 +4,20 @@ Response models for Phase 2: Full JSON schema extraction from Gemini.
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
+class TriggeredFlag(BaseModel):
+    keyword: str = Field(..., description="The high-risk keyword that triggered this flag")
+    severity: str = Field(..., description="'low' | 'medium' | 'high'")
+    context: str = Field(..., description="The contextual sentence where the keyword was used")
+    policy_reference: str = Field(..., description="The policy document or rule this keyword relates to")
+    action_required: bool = Field(..., description="True if immediate action is required (severity == high)")
+    source: str = Field(default="deterministic", description="'deterministic' | 'ai_corroborated' — indicates whether flag was keyword-matched or synthesised from Phase 2 AI findings")
+
+class DeterministicCompliance(BaseModel):
+    flags: List[TriggeredFlag] = Field(..., description="List of all deterministic keyword flags triggered")
+    total_flags: int = Field(..., description="Total count of triggered flags")
+    compliance_risk_score: float = Field(..., description="Normalized risk score from 0.0 to 1.0 based on keyword severity")
+    auto_escalate: bool = Field(..., description="True if any high severity keywords were triggered")
+
 class SentimentAnalysis(BaseModel):
     overall: str = Field(..., description="'positive' | 'negative' | 'neutral' | 'mixed'")
     sentiment_score: float = Field(default=0.0, ge=-1.0, le=1.0, description="Numeric sentiment score: -1.0 (very negative) to +1.0 (very positive)")
@@ -42,6 +56,7 @@ class SpeakerInfo(BaseModel):
     language_per_speaker: dict = Field(..., description="Mapping of speaker label to ISO language code, e.g. {'Agent': 'en', 'Customer': 'ta'}")
 
 class GeminiAnalysisResponse(BaseModel):
+    transcript: str = Field(..., description="The full, verbatim transcript of the conversation.")
     summary: str = Field(..., description="A concise 2-4 sentence summary of the entire conversation")
     language_detected: str = Field(..., description="The primary ISO language code of the conversation")
     languages_all: List[str] = Field(..., description="All ISO language codes detected, including code-switching instances")
@@ -88,7 +103,9 @@ class ConversationAnalysisResult(BaseModel):
 
     # Bonus / Meta
     speakers: Optional[SpeakerInfo] = Field(None, description="Speaker diarization and tracking")
+    transcript: Optional[str] = Field(None, description="The verbatim transcript of the conversation")
     rag_policies_used: List[str] = Field(..., description="The specific policies passed into the prompt for transparency")
+    deterministic_compliance: Optional[DeterministicCompliance] = Field(None, description="Results from the deterministic keyword-based compliance engine (Phase 4).")
     rag_actions: Optional[RagActions] = Field(None, description="Structured action plan generated from feeding Phase 2 data back into the RAG Pipeline (Phase 3).")
     error: Optional[str] = Field(None, description="Populated only if status == 'failed'")
 

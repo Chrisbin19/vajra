@@ -1,5 +1,142 @@
 {
   "business_domain": "banking",
-  "products_services": ["Credit Cards", "Savings Accounts"],
-  "policies": ["Must verify user identity before discussing account details."]
+  "company_name": "VAJRA Banking Client",
+  "products_services": [
+    "Credit Cards",
+    "Savings Accounts",
+    "Loans",
+    "Fixed Deposits",
+    "Net Banking"
+  ],
+  "policies": [
+    "Must verify user identity before discussing account details.",
+    "PCI-DSS: Sensitive authentication data must never be retained.",
+    "Fraud report must be filed within 24 hours of detection.",
+    "Any legal threat must be escalated to legal team immediately."
+  ],
+  "escalation_threshold": "medium",
+  "escalation_rules": {
+    "high_risk_keywords": [
+      {
+        "keyword": "lawsuit",
+        "severity": "high",
+        "policy_reference": "Legal Escalation Procedure — Sec 4.1"
+      },
+      {
+        "keyword": "lawyer",
+        "severity": "high",
+        "policy_reference": "Legal Escalation Procedure — Sec 4.1"
+      },
+      {
+        "keyword": "legal action",
+        "severity": "high",
+        "policy_reference": "Legal Escalation Procedure — Sec 4.1"
+      },
+      {
+        "keyword": "sue",
+        "severity": "high",
+        "policy_reference": "Legal Escalation Procedure — Sec 4.1"
+      },
+      {
+        "keyword": "court",
+        "severity": "high",
+        "policy_reference": "Legal Escalation Procedure — Sec 4.1"
+      },
+      {
+        "keyword": "consumer court",
+        "severity": "high",
+        "policy_reference": "Legal Escalation Procedure — Sec 4.1"
+      },
+      {
+        "keyword": "fraud",
+        "severity": "high",
+        "policy_reference": "Fraud Detection Policy — PCI-DSS 10.2"
+      },
+      {
+        "keyword": "unauthorized",
+        "severity": "high",
+        "policy_reference": "Fraud Detection Policy — PCI-DSS 10.2"
+      },
+      {
+        "keyword": "stolen",
+        "severity": "high",
+        "policy_reference": "Card Security Policy — Sec 6.3"
+      },
+      {
+        "keyword": "hacked",
+        "severity": "high",
+        "policy_reference": "Cybersecurity Incident Response — Sec 2.1"
+      },
+      {
+        "keyword": "scam",
+        "severity": "high",
+        "policy_reference": "Fraud Detection Policy — PCI-DSS 10.2"
+      },
+      {
+        "keyword": "chargeback",
+        "severity": "medium",
+        "policy_reference": "Dispute Resolution Policy — Sec 3.2"
+      },
+      {
+        "keyword": "dispute",
+        "severity": "medium",
+        "policy_reference": "Dispute Resolution Policy — Sec 3.2"
+      },
+      {
+        "keyword": "supervisor",
+        "severity": "medium",
+        "policy_reference": "Customer Escalation Request — Sec 5.1"
+      },
+      {
+        "keyword": "manager",
+        "severity": "medium",
+        "policy_reference": "Customer Escalation Request — Sec 5.1"
+      },
+      {
+        "keyword": "complaint",
+        "severity": "medium",
+        "policy_reference": "Complaint Handling Policy — RBI Circular 2023"
+      },
+      {
+        "keyword": "rbi",
+        "severity": "high",
+        "policy_reference": "Regulatory Escalation — RBI Compliance"
+      },
+      {
+        "keyword": "ombudsman",
+        "severity": "high",
+        "policy_reference": "Regulatory Escalation — Banking Ombudsman Scheme"
+      },
+      {
+        "keyword": "threaten",
+        "severity": "high",
+        "policy_reference": "Abuse & Threat Policy — Sec 9.1"
+      },
+      {
+        "keyword": "abuse",
+        "severity": "high",
+        "policy_reference": "Abuse & Threat Policy — Sec 9.1"
+      },
+      {
+        "keyword": "harass",
+        "severity": "high",
+        "policy_reference": "Abuse & Threat Policy — Sec 9.1"
+      },
+      {
+        "keyword": "refund",
+        "severity": "low",
+        "policy_reference": "Refund Request Processing — Sec 7.4"
+      },
+      {
+        "keyword": "cancel",
+        "severity": "low",
+        "policy_reference": "Account Closure Policy — Sec 8.1"
+      },
+      {
+        "keyword": "close account",
+        "severity": "medium",
+        "policy_reference": "Account Closure Policy — Sec 8.1"
+      }
+    ]
+  }
 }
