@@ -5,6 +5,7 @@ import os
 import uuid
 import aiofiles
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
+from typing import Optional
 from api.models.request import TextAnalysisRequest
 from api.models.response import ConversationAnalysisResult, DeterministicCompliance
 from core.compliance import apply_compliance_triggers
@@ -43,7 +44,8 @@ def _get_rag_policies(client_id: str) -> list[str]:
     """
     Returns compliance policies for the client from txt file (migrated from transight).
     """
-    rules_path = os.path.join("data", "domain_knowledge", f"{client_id}_rules.txt")
+    base_id = client_id.split("_client")[0].split("_enterprise")[0].split("_provider")[0]
+    rules_path = os.path.join("data", "domain_knowledge", f"{base_id}_rules.txt")
     try:
         with open(rules_path, 'r') as f:
             content = f.read()
@@ -88,7 +90,8 @@ def _validate_audio_file(filename: str, file_size: int) -> str:
 )
 async def analyze_audio(
     audio_file: UploadFile = File(...),
-    client_id: str = Form(...),
+    client_id: Optional[str] = Form(None),
+    client_config: Optional[str] = Form(None),
 ):
     """
     Endpoint handling audio uploads. Validates the incoming audio file, saves it
@@ -123,15 +126,33 @@ async def analyze_audio(
 
     # ── Step 6: Trigger Gemini Analysis (Phase 2) ──
     print(f"[Phase 2][{conversation_id}] Starting audio analysis pipeline...")
-    client_config = _get_client_config(client_id_stripped)
-    rag_policies = _get_rag_policies(client_id_stripped)
+    # Use provided config directly, or load from file
+    if client_config:
+        import json
+        from api.models.request import ClientConfigModel
+        try:
+            raw_config = json.loads(client_config) if isinstance(client_config, str) else client_config
+            config = ClientConfigModel(**raw_config).model_dump()
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid JSON in client_config")
+        policies = config.get("policies", [])
+        client_id_stripped = client_id.strip() if client_id else "custom"
+    elif client_id:
+        client_id_stripped = client_id.strip()
+        config = _get_client_config(client_id_stripped)
+        policies = _get_rag_policies(client_id_stripped)
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Either client_id or client_config must be provided"
+        )
     
     result = await gemini_service.analyze_audio(
         conversation_id=conversation_id,
         client_id=client_id_stripped,
         audio_path=temp_path,
-        client_config=client_config,
-        rag_policies=rag_policies,
+        client_config=config,
+        rag_policies=policies,
     )
     
     if result.status == "failed":
@@ -142,8 +163,8 @@ async def analyze_audio(
     if result.transcript:
         flags_data = apply_compliance_triggers(
             result.transcript,
-            client_config,
-            ai_result=result.model_dump(),   # ← hybrid fallback
+            config,                              # ← resolved dict, not raw Form string
+            ai_result=result.model_dump(),
         )
         result.deterministic_compliance = DeterministicCompliance(**flags_data)
         
@@ -152,8 +173,8 @@ async def analyze_audio(
     rag_actions = await gemini_service.analyze_json_for_rag(
         client_id=client_id_stripped,
         analysis_json=result.model_dump(),
-        client_config=client_config,
-        rag_policies=rag_policies
+        client_config=config,
+        rag_policies=policies
     )
     result.rag_actions = rag_actions
     
@@ -177,15 +198,27 @@ async def analyze_text(request: TextAnalysisRequest):
     
     # ── Step 2: Trigger Gemini Analysis (Phase 2) ──
     print(f"[Phase 2][{conversation_id}] Starting text analysis pipeline...")
-    client_config = _get_client_config(client_id_stripped)
-    rag_policies = _get_rag_policies(client_id_stripped)
+    # Use provided config directly, or load from file
+    if request.client_config:
+        config = request.client_config.model_dump()
+        policies = config.get("policies", [])
+        client_id_stripped = request.client_id.strip() if request.client_id else "custom"
+    elif request.client_id:
+        client_id_stripped = request.client_id.strip()
+        config = _get_client_config(client_id_stripped)
+        policies = _get_rag_policies(client_id_stripped)
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Either client_id or client_config must be provided"
+        )
     
     result = await gemini_service.analyze_text(
         conversation_id=conversation_id,
         client_id=client_id_stripped,
         transcript=request.transcript,
-        client_config=client_config,
-        rag_policies=rag_policies,
+        client_config=config,
+        rag_policies=policies,
     )
     
     
@@ -198,8 +231,8 @@ async def analyze_text(request: TextAnalysisRequest):
     if transcript_to_check:
         flags_data = apply_compliance_triggers(
             transcript_to_check,
-            client_config,
-            ai_result=result.model_dump(),   # ← hybrid fallback
+            config,                              # ← resolved dict, not raw request field
+            ai_result=result.model_dump(),
         )
         result.deterministic_compliance = DeterministicCompliance(**flags_data)
         
@@ -208,8 +241,8 @@ async def analyze_text(request: TextAnalysisRequest):
     rag_actions = await gemini_service.analyze_json_for_rag(
         client_id=client_id_stripped,
         analysis_json=result.model_dump(),
-        client_config=client_config,
-        rag_policies=rag_policies
+        client_config=config,
+        rag_policies=policies
     )
     result.rag_actions = rag_actions
         
