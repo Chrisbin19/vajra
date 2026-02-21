@@ -11,7 +11,8 @@ import os
 import json
 import time
 import re
-import google.generativeai as genai
+import google.genai as genai
+from google.genai import types
 from dotenv import load_dotenv
 from api.models.response import (
     ConversationAnalysisResult,
@@ -29,24 +30,7 @@ api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
     print("WARNING: GEMINI_API_KEY is not set in .env file.")
 
-genai.configure(api_key=api_key)
-
-# FIX 1: Use the standard 2.5 flash model name
-MODEL_NAME = "gemini-2.5-flash"
-
-# FIX 2: NO response_mime_type in the main model config.
-# response_mime_type="application/json" BREAKS audio analysis because
-# Gemini cannot enforce JSON output when the input contains an audio File object.
-# We handle JSON extraction manually via _extract_json_from_response().
-model = genai.GenerativeModel(
-    model_name=MODEL_NAME,
-    generation_config={
-        "temperature": 0.1,
-        "top_p": 0.8,
-        "max_output_tokens": 4096,
-        # DO NOT add response_mime_type here — breaks audio
-    }
-)
+client = genai.Client(api_key=api_key)
 
 
 def _build_analysis_prompt(
@@ -248,10 +232,9 @@ def _upload_audio_to_gemini(audio_path: str):
     filename = os.path.basename(audio_path)
 
     print(f"[Gemini] Uploading {filename} ({mime_type})...")
-    gemini_file = genai.upload_file(
-        path=audio_path,
-        mime_type=mime_type,
-        display_name=filename,
+    gemini_file = client.files.upload(
+        file=audio_path,
+        config=types.UploadFileConfig(mime_type=mime_type, display_name=filename),
     )
     print(f"[Gemini] Uploaded. URI: {gemini_file.uri}")
     return gemini_file
@@ -403,7 +386,13 @@ async def analyze_audio(
         print(f"[Phase 2][{conversation_id}] Sending to {MODEL_NAME}...")
 
         # 3. Generate — audio file + text prompt together
-        response = model.generate_content([gemini_file, prompt])
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=[gemini_file, prompt],
+            config=types.GenerateContentConfig(
+                temperature=0.1, top_p=0.8, max_output_tokens=4096,
+            ),
+        )
         print(f"[Phase 2][{conversation_id}] Response received. Parsing...")
 
         # 4. FIX 3: Parse with 3-layer fallback
@@ -423,12 +412,9 @@ async def analyze_audio(
         except Exception:
             pass
         try:
-            gemini_file.delete()  # preferred method in current SDK
-        except AttributeError:
-            try:
-                genai.delete_file(gemini_file.name)  # older SDK fallback
-            except Exception:
-                pass  # cleanup is best-effort, never crash on it
+            client.files.delete(name=gemini_file.name)
+        except Exception:
+            pass  # cleanup is best-effort, never crash on it
 
         print(f"[Phase 2][{conversation_id}] AUDIO complete in {processing_time_ms}ms.")
         return result
@@ -463,7 +449,13 @@ async def analyze_text(
         print(f"[Phase 2][{conversation_id}] Sending to {MODEL_NAME}...")
 
         # 2. Generate
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.1, top_p=0.8, max_output_tokens=4096,
+            ),
+        )
         print(f"[Phase 2][{conversation_id}] Response received. Parsing...")
 
         # 3. FIX 3: Parse with 3-layer fallback
@@ -522,16 +514,15 @@ Generate a structured action plan. Reference specific policy numbers.
 Priority must be exactly one of: P1 - Critical, P2 - High, P3 - Nominal
 """
         # Structured output mode is safe here — input is text only, no audio file
-        structured_model = genai.GenerativeModel(
-            model_name=MODEL_NAME,
-            generation_config=genai.GenerationConfig(
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+            config=types.GenerateContentConfig(
                 response_mime_type="application/json",
                 response_schema=RagActions,
                 temperature=0.1,
-            )
+            ),
         )
-
-        response = structured_model.generate_content(prompt)
         processing_time_ms = int((time.time() - start_time) * 1000)
         print(f"[Phase 3] RAG complete in {processing_time_ms}ms.")
 
@@ -565,7 +556,13 @@ def analyze_text_sync(transcript: str, client_config: dict) -> dict:
     prompt = _build_analysis_prompt(client_config, auto_policies, "text", transcript)
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.1, top_p=0.8, max_output_tokens=4096,
+            ),
+        )
         # FIX 3: Use fallback parser instead of raw json.loads
         data = _extract_json_from_response(response.text)
         data["processing_time_ms"] = int((time.time() - start) * 1000)
