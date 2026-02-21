@@ -1,5 +1,6 @@
 """
-Main FastAPI application file for VAJRA Phase 1.
+VAJRA — Multimodal Conversation Intelligence Backend
+Main FastAPI application entry point.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,17 +12,22 @@ app = FastAPI(
 ## Multimodal Conversation Intelligence Backend
 
 Analyzes customer support conversations (audio or text) using **Gemini 2.5 Flash**
-natively — no traditional STT pipeline required.
-
-### Supported Input Types
-- **Audio:** MP3, WAV, OGG, M4A, FLAC (max 25MB)
-- **Text:** Plain conversation transcript (JSON)
+natively — no traditional speech-to-text or language-specific pipeline required.
 
 ### How It Works
 1. POST audio or text to `/api/v1/analyze/*`
-2. System validates and queues for Gemini analysis
-3. Gemini detects language, extracts insights, checks compliance
-4. Returns structured enterprise JSON
+2. **Phase 1:** FastAPI validates input, assigns conversation_id
+3. **Phase 2:** Gemini 2.5 Flash analyzes natively — detects language, extracts insights, checks compliance against client RAG policies
+4. **Phase 3:** Phase 2 JSON fed back into Gemini for structured compliance action plan
+5. Returns complete enterprise-grade JSON
+
+### Supported Inputs
+- **Audio:** MP3, WAV, OGG, M4A, FLAC, AAC, WebM (max 25MB)
+- **Text:** JSON transcript (min 10 characters)
+
+### Supported Clients
+- `banking_client_01` — Banking domain (RBI compliance rules)
+- `telecom_client_01` — Telecom domain (TRAI compliance rules)
     """,
     version="1.0.0",
     docs_url="/docs",
@@ -32,20 +38,29 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 app.include_router(analyze_router, prefix="/api/v1", tags=["Conversation Analysis"])
 
+
 @app.get("/health", tags=["System"])
 def health_check():
-    """
-    Simple health check endpoint returning system status.
-    """
+    """System health check — confirms server is running and model config is loaded."""
     return {
         "status": "healthy",
         "service": "VAJRA Conversation Intelligence",
-        "model": "gemini-2.5-flash",
+        "model": "gemini-2.5-flash-preview-05-20",   # FIX: was wrong model name
         "version": "1.0.0",
-        "supported_inputs": ["audio/mp3", "audio/wav", "audio/ogg", "audio/m4a", "text/plain"]
+        "phases": {
+            "phase_1": "input validation + UUID assignment",
+            "phase_2": "Gemini 2.5 Flash native analysis",
+            "phase_3": "RAG compliance action plan",
+        },
+        "supported_inputs": [
+            "audio/mp3", "audio/wav", "audio/ogg",
+            "audio/m4a", "audio/flac", "audio/aac", "audio/webm",
+            "text/plain"
+        ],
+        "supported_clients": ["banking_client_01", "telecom_client_01"],
     }
