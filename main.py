@@ -77,3 +77,28 @@ def health_check():
         ],
         "supported_clients": ["banking_client_01", "insurance_enterprise_v1"],
     }
+
+if __name__ == "__main__":
+    import sys
+    import subprocess
+    
+    print("\n==================================================")
+    print("             VAJRA LAUNCH MENU")
+    print("==================================================")
+    print("[1] Start API Server (for frontend/Web UI)")
+    print("[2] Run Interactive Terminal Tester (Full Pipeline)")
+    print("==================================================")
+    choice = input("Enter your choice (1 or 2): ").strip()
+    
+    if choice == "1":
+        import uvicorn
+        print("\nStarting FastAPI server on http://0.0.0.0:8000 ...")
+        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
+    elif choice == "2":
+        print("\nLaunching Interactive Terminal Tester...\n")
+        try:
+            subprocess.run([sys.executable, "test_interactive.py"])
+        except KeyboardInterrupt:
+            print("\nExiting VAJRA.")
+    else:
+        print("Invalid choice. Exiting.")
