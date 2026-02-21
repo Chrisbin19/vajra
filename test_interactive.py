@@ -81,10 +81,82 @@ def analyze_audio(filepath):
         return json.loads(e.read().decode('utf-8'))
 
 
+class C:
+    RESET = "\033[0m"; BOLD = "\033[1m"; DIM = "\033[2m"
+    CYAN = "\033[96m"; GREEN = "\033[92m"; YELLOW = "\033[93m"
+    RED = "\033[91m";  WHITE = "\033[97m"; MAGENTA = "\033[95m"
+
+def print_result(result: dict):
+    if result.get("status") == "failed" or "detail" in result:
+        err = result.get('error') or result.get('detail')
+        print(f"\n{C.RED}✖ API ERROR: {err}{C.RESET}\n")
+        return
+
+    # --- Phase 2: Core Analysis ---
+    print(f"\n{C.BOLD}{C.CYAN}▸ Phase 2 — Core AI Analysis{C.RESET}")
+    print(f"  {C.DIM}Summary: {result.get('summary', '')}{C.RESET}")
+    
+    intent = result.get('primary_intent', '')
+    print(f"  {C.DIM}Intent : {C.RESET}{C.WHITE}{intent}{C.RESET}")
+    
+    sent = result.get('sentiment', {})
+    score = sent.get('sentiment_score', 0)
+    scol = C.GREEN if score > 0.2 else (C.RED if score < -0.2 else C.YELLOW)
+    print(f"  {C.DIM}Sentiment: {C.RESET}{scol}{sent.get('overall', '').upper()} ({score}){C.RESET}")
+
+    # --- Phase 3: RAG Action Plan ---
+    rag = result.get("rag_actions")
+    if rag:
+        print(f"\n{C.BOLD}{C.MAGENTA}▸ Phase 3 — RAG Action Plan{C.RESET}")
+        pri = rag.get('priority', '')
+        pcol = C.RED if 'Critical' in pri or 'High' in pri else C.YELLOW
+        print(f"  {C.DIM}Priority : {C.RESET}{pcol}{C.BOLD}{pri}{C.RESET}")
+        
+        print(f"  {C.DIM}Suggested Actions:{C.RESET}")
+        for act in rag.get('suggested_actions', []):
+            print(f"    • {C.WHITE}{act}{C.RESET}")
+            
+        print(f"  {C.DIM}Policy Justifications:{C.RESET}")
+        for pol in rag.get('policy_justifications', []):
+            print(f"    {C.DIM}↳ {pol}{C.RESET}")
+            
+        if rag.get('coaching_notes'):
+            print(f"  {C.DIM}Coaching : {C.RESET}{C.YELLOW}{rag.get('coaching_notes')}{C.RESET}")
+
+    # --- Phase 4: Deterministic Compliance ---
+    det = result.get("deterministic_compliance")
+    if det:
+        print(f"\n{C.BOLD}{C.YELLOW}▸ Phase 4 — Deterministic Compliance Engine{C.RESET}")
+        rscore = det.get("compliance_risk_score", 0)
+        flags = det.get("flags", [])
+        esc = det.get("auto_escalate", False)
+        
+        rcol = C.RED if rscore > 0.5 else (C.YELLOW if rscore > 0 else C.GREEN)
+        print(f"  {C.DIM}Risk Score   : {C.RESET}{rcol}{rscore:.2f} / 1.00{C.RESET}")
+        print(f"  {C.DIM}Total Flags  : {C.RESET}{C.WHITE}{det.get('total_flags', 0)}{C.RESET}")
+        print(f"  {C.DIM}Auto-Escalate: {C.RESET}{C.RED if esc else C.GREEN}{'YES' if esc else 'NO'}{C.RESET}")
+
+        if flags:
+            print()
+            for flag in flags:
+                sev    = flag.get("severity","?")
+                source = flag.get("source", "deterministic")
+                fc     = C.RED if sev=="high" else (C.YELLOW if sev=="medium" else C.DIM)
+                src_badge = (
+                    f"{C.GREEN}✦ DETERMINISTIC{C.RESET}"
+                    if source == "deterministic"
+                    else f"{C.YELLOW}✧ AI-CORROBORATED{C.RESET}"
+                )
+                print(f"    {fc}[{sev.upper()}]{C.RESET} {src_badge}  {C.BOLD}{flag.get('keyword','')}{C.RESET}")
+                print(f"    {C.DIM}Context : {flag.get('context','')[:80]}{C.RESET}")
+                print(f"    {C.DIM}Policy  : {flag.get('policy_reference','')}{C.RESET}")
+                if flag.get("action_required"):
+                    print(f"    {C.RED}⚠  Immediate action required{C.RESET}")
+                print()
+    print("=" * 50)
+
+
 if __name__ == "__main__":
-    # ── Embedded server (subprocess with silenced output) ─────────────────────
-    # First check if a server is already running on port 8000
-    print("Initializing test environment...")
     _server_proc = None
     try:
         urllib.request.urlopen(f"{BASE_URL}/health", timeout=1)
@@ -141,25 +213,9 @@ if __name__ == "__main__":
                 print("⚠️  Error: Transcript in file must be at least 10 characters!")
                 continue
                 
-            print(f"\nSending '{filepath}' to API...")
+            print("\nSending to API...")
             result = analyze_text(text)
-            
-            print("\n" + "="*40)
-            print("API RESPONSE (PHASE 2 JSON):")
-            
-            # Make a copy to print Phase 2 separately
-            import copy
-            phase2 = copy.deepcopy(result)
-            rag_data = phase2.pop('rag_actions', None)
-            
-            print(json.dumps(phase2, indent=2, ensure_ascii=False))
-            
-            if rag_data:
-                print("\n" + "="*40)
-                print("PHASE 3: ACTIONABLE RAG REPORT:")
-                print(json.dumps(rag_data, indent=2, ensure_ascii=False))
-                
-            print("="*40)
+            print_result(result)
             
         elif choice == '2':
             print("\n" + "-"*40)
@@ -168,22 +224,7 @@ if __name__ == "__main__":
             
             print("\nSending to API...")
             result = analyze_audio(filepath)
-            
-            print("\n" + "="*40)
-            print("API RESPONSE (PHASE 2 JSON):")
-            
-            import copy
-            phase2 = copy.deepcopy(result)
-            rag_data = phase2.pop('rag_actions', None)
-            
-            print(json.dumps(phase2, indent=2, ensure_ascii=False))
-            
-            if rag_data:
-                print("\n" + "="*40)
-                print("PHASE 3: ACTIONABLE RAG REPORT:")
-                print(json.dumps(rag_data, indent=2, ensure_ascii=False))
-                
-            print("="*40)
+            print_result(result)
             
         elif choice == '3':
             print("Goodbye!")
