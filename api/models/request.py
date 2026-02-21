@@ -4,14 +4,31 @@ Pydantic Request and Response Models for VAJRA Phase 1.
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
+class ClientConfigModel(BaseModel):
+    """
+    Client-defined configuration that influences analysis.
+    Mandatory feature implementation for Phase 3.
+    """
+    domain: Optional[str] = Field("general", description="Business domain (e.g., banking, insurance)")
+    company_name: Optional[str] = Field("Unknown Company", description="Name of the company")
+    products: Optional[list[str]] = Field(default_factory=list, description="Products or services offered")
+    policies: Optional[list[str]] = Field(default_factory=list, description="Policies or rules to enforce")
+    risk_triggers: Optional[list[str]] = Field(default_factory=list, description="Risk or compliance triggers")
+    escalation_threshold: Optional[str] = Field("medium", description="Threshold for escalation")
+
 class TextAnalysisRequest(BaseModel):
     """
     Request model for analyzing a text conversation transcript.
     """
-    client_id: str = Field(
-        ...,
+    client_id: Optional[str] = Field(
+        None,
         description="Client identifier — used to fetch domain config from SQLite",
         json_schema_extra={"example": "banking_client_01"}
+    )
+    client_config: Optional[ClientConfigModel] = Field(
+        None,
+        description="Optional dynamic client config JSON",
+        json_schema_extra={"example": {"domain": "insurance", "products": ["term life"], "policies": ["Must mention free look period"], "risk_triggers": ["guaranteed returns"]}}
     )
     transcript: str = Field(
         ...,
@@ -27,11 +44,12 @@ class TextAnalysisRequest(BaseModel):
 
     @field_validator("client_id")
     @classmethod
-    def validate_client_id(cls, v: str) -> str:
+    def validate_client_id(cls, v: Optional[str]) -> Optional[str]:
         """Strips whitespace and ensures client_id is not empty."""
-        v = v.strip()
-        if not v:
-            raise ValueError("client_id must not be empty after stripping whitespace")
+        if v is not None:
+            v = v.strip()
+            if not v:
+                raise ValueError("client_id must not be empty after stripping whitespace")
         return v
 
     @field_validator("transcript")

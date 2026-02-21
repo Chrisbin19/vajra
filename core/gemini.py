@@ -508,7 +508,9 @@ Review this conversation analysis and generate a specific, actionable compliance
 ### Client Context
 - Domain: {client_config.get('domain', 'Unknown')}
 - Company: {client_config.get('company_name', 'Unknown')}
-- Risk Triggers: {", ".join(client_config.get('risk_triggers', []))}
+- Supported Products: {", ".join(client_config.get('products', []))}
+- Known Risk Triggers: {", ".join(client_config.get('risk_triggers', []))}
+- Escalation Threshold: {client_config.get('escalation_threshold', 'medium')}
 
 ### Compliance Policies
 {policies_block}

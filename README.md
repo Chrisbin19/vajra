@@ -25,9 +25,10 @@ natively — no traditional speech-to-text or language-specific pipeline require
 - **Audio:** MP3, WAV, OGG, M4A, FLAC, AAC, WebM (max 25MB)
 - **Text:** JSON transcript (min 10 characters)
 
-### Supported Clients
+### 2. Supported Domains
+The system currently provides rule-based compliance evaluation for:
 - `banking_client_01` — Banking domain (RBI compliance rules)
-- `telecom_client_01` — Telecom domain (TRAI compliance rules)
+- `insurance_enterprise_v1` — Insurance domain (IRDAI compliance rules)
     """,
     version="1.0.0",
     docs_url="/docs",
@@ -62,5 +63,5 @@ def health_check():
             "audio/m4a", "audio/flac", "audio/aac", "audio/webm",
             "text/plain"
         ],
-        "supported_clients": ["banking_client_01", "telecom_client_01"],
+        "supported_clients": ["banking_client_01", "insurance_enterprise_v1"],
     }
