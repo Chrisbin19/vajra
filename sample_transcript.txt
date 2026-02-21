@@ -1,11 +1,11 @@
-Agent: Good morning, State Bank customer support, this is Priya. How can I assist you today?
-Customer: Hi Priya, I'm very worried. I just checked my account and there's an unauthorized transaction of Rs.4200 dated January 14th. I never made this payment!
-Agent: I completely understand your concern and I sincerely apologize for the distress this has caused. Let me help you resolve this immediately. Can I first verify your identity? Could you please provide me the last 4 digits of your account number?
-Customer: Yes, it's 7823.
-Agent: Thank you, Mr. Sharma. I've verified your identity. I can see the suspicious transaction from January 14th for Rs.4200. It appears to be from an unknown merchant.
-Customer: Yes! I was home that day, I never used the card. Can you please block my card? I'm scared there might be more transactions.
-Agent: Absolutely. I'm blocking your debit card right now — it's done. You'll receive an SMS confirmation in about 30 seconds. I'm also raising a dispute ticket for this Rs.4200 transaction. Your ticket number is DIS-2024-09821. The dispute resolution team will review this within 7 working days.
-Customer: Thank you so much Priya. What should I do next?
-Agent: You'll receive a new debit card at your registered address within 3-5 business days. Meanwhile, you can use UPI or net banking for transactions. I'd also recommend checking if any other transactions look suspicious and let us know. Is there anything else I can help you with today?
-Customer: No, that's all. Thank you for the quick help, I feel much better now.
-Agent: You're welcome, Mr. Sharma. I'm glad we could resolve this for you. Have a safe day. Goodbye!
+ഏജന്റ്: സുപ്രഭാതം, സ്റ്റേറ്റ് ബാങ്ക് കസ്റ്റമർ സപ്പോർട്ട്, ഇതാണ് പ്രിയ. ഇന്ന് എനിക്ക് നിങ്ങളെ എങ്ങനെ സഹായിക്കാനാകും?
+ഉപഭോക്താവ്: ഹായ് പ്രിയ, എനിക്ക് വളരെ വിഷമമുണ്ട്. ഞാൻ ഇപ്പോൾ എന്റെ അക്കൗണ്ട് പരിശോധിച്ചു, ജനുവരി 14 ന് 4200 രൂപയുടെ അനധികൃത ഇടപാട് നടന്നു. ഞാൻ ഒരിക്കലും ഈ പണമടച്ചില്ല!
+ഏജന്റ്: നിങ്ങളുടെ ആശങ്ക എനിക്ക് പൂർണ്ണമായും മനസ്സിലാകും, ഇത് ഉണ്ടാക്കിയ ബുദ്ധിമുട്ടിന് ഞാൻ ആത്മാർത്ഥമായി ക്ഷമ ചോദിക്കുന്നു. ഇത് ഉടൻ പരിഹരിക്കാൻ ഞാൻ നിങ്ങളെ സഹായിക്കട്ടെ. എനിക്ക് ആദ്യം നിങ്ങളുടെ ഐഡന്റിറ്റി പരിശോധിക്കാൻ കഴിയുമോ? ദയവായി നിങ്ങളുടെ അക്കൗണ്ട് നമ്പറിന്റെ അവസാന 4 അക്കങ്ങൾ എനിക്ക് നൽകാമോ?
+ഉപഭോക്താവ്: അതെ, അത് 7823 ആണ്.
+ഏജന്റ്: നന്ദി, മിസ്റ്റർ ശർമ്മ. ഞാൻ നിങ്ങളുടെ ഐഡന്റിറ്റി പരിശോധിച്ചു. ജനുവരി 14 ന് 4200 രൂപയുടെ സംശയാസ്പദമായ ഇടപാട് എനിക്ക് കാണാൻ കഴിയും. അത് ഒരു അജ്ഞാത വ്യാപാരിയിൽ നിന്നാണെന്ന് തോന്നുന്നു.
+ഉപഭോക്താവ്: അതെ! ഞാൻ ആ ദിവസം വീട്ടിലായിരുന്നു, ഞാൻ ഒരിക്കലും കാർഡ് ഉപയോഗിച്ചിട്ടില്ല. ദയവായി എന്റെ കാർഡ് ബ്ലോക്ക് ചെയ്യാമോ? കൂടുതൽ ഇടപാടുകൾ ഉണ്ടാകുമെന്ന് ഞാൻ ഭയപ്പെടുന്നു.
+ഏജന്റ്: തീർച്ചയായും. ഞാൻ ഇപ്പോൾ നിങ്ങളുടെ ഡെബിറ്റ് കാർഡ് ബ്ലോക്ക് ചെയ്യുകയാണ് - അത് കഴിഞ്ഞു. ഏകദേശം 30 സെക്കൻഡിനുള്ളിൽ നിങ്ങൾക്ക് ഒരു SMS സ്ഥിരീകരണം ലഭിക്കും. ഈ 4200 രൂപയുടെ ഇടപാടിനുള്ള ഒരു തർക്ക ടിക്കറ്റും ഞാൻ ഉന്നയിക്കുന്നുണ്ട്. നിങ്ങളുടെ ടിക്കറ്റ് നമ്പർ DIS-2024-09821 ആണ്. തർക്ക പരിഹാര സംഘം 7 പ്രവൃത്തി ദിവസങ്ങൾക്കുള്ളിൽ ഇത് അവലോകനം ചെയ്യും.
+ഉപഭോക്താവ്: വളരെ നന്ദി പ്രിയ. അടുത്തതായി ഞാൻ എന്തുചെയ്യണം?
+ഏജന്റ്: 3-5 പ്രവൃത്തി ദിവസങ്ങൾക്കുള്ളിൽ നിങ്ങളുടെ രജിസ്റ്റർ ചെയ്ത വിലാസത്തിൽ നിങ്ങൾക്ക് ഒരു പുതിയ ഡെബിറ്റ് കാർഡ് ലഭിക്കും. അതേസമയം, ഇടപാടുകൾക്കായി നിങ്ങൾക്ക് UPI അല്ലെങ്കിൽ നെറ്റ് ബാങ്കിംഗ് ഉപയോഗിക്കാം. മറ്റേതെങ്കിലും ഇടപാടുകൾ സംശയാസ്പദമായി തോന്നുന്നുണ്ടോ എന്ന് പരിശോധിച്ച് ഞങ്ങളെ അറിയിക്കാനും ഞാൻ ശുപാർശ ചെയ്യുന്നു. ഇന്ന് എനിക്ക് നിങ്ങളെ സഹായിക്കാൻ കഴിയുന്ന മറ്റെന്തെങ്കിലും ഉണ്ടോ?
+ഉപഭോക്താവ്: ഇല്ല, അത്രമാത്രം. പെട്ടെന്നുള്ള സഹായത്തിന് നന്ദി, ഇപ്പോൾ എനിക്ക് വളരെ സുഖം തോന്നുന്നു.
+ഏജന്റ്: നിങ്ങൾക്ക് സ്വാഗതം, മിസ്റ്റർ ശർമ്മ. നിങ്ങൾക്ക് ഇത് പരിഹരിക്കാൻ കഴിഞ്ഞതിൽ എനിക്ക് സന്തോഷമുണ്ട്. സുരക്ഷിതമായ ഒരു ദിവസം ആശംസിക്കുന്നു. വിട!

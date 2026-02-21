@@ -62,4 +62,4 @@ else:
 
 print("\nFull result JSON:")
 import json
-print(json.dumps(result, indent=2, default=str))
+print(json.dumps(result, indent=2, default=str, ensure_ascii=False))

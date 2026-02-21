@@ -96,7 +96,7 @@ response = requests.post("http://127.0.0.1:8000/api/v1/analyze/json_rag", json=r
 
 if response.status_code == 200:
     print("\nSUCCESS!")
-    print(json.dumps(response.json().get('rag_actions'), indent=2))
+    print(json.dumps(response.json().get('rag_actions'), indent=2, ensure_ascii=False))
 else:
     print(f"\nFAILED: {response.status_code}")
     print(response.text)

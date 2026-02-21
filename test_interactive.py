@@ -1,3 +1,6 @@
+import sys, io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
 import urllib.request
 import urllib.error
 import json
@@ -107,12 +110,12 @@ if __name__ == "__main__":
             phase2 = copy.deepcopy(result)
             rag_data = phase2.pop('rag_actions', None)
             
-            print(json.dumps(phase2, indent=2))
+            print(json.dumps(phase2, indent=2, ensure_ascii=False))
             
             if rag_data:
                 print("\n" + "="*40)
                 print("PHASE 3: ACTIONABLE RAG REPORT:")
-                print(json.dumps(rag_data, indent=2))
+                print(json.dumps(rag_data, indent=2, ensure_ascii=False))
                 
             print("="*40)
             
@@ -131,12 +134,12 @@ if __name__ == "__main__":
             phase2 = copy.deepcopy(result)
             rag_data = phase2.pop('rag_actions', None)
             
-            print(json.dumps(phase2, indent=2))
+            print(json.dumps(phase2, indent=2, ensure_ascii=False))
             
             if rag_data:
                 print("\n" + "="*40)
                 print("PHASE 3: ACTIONABLE RAG REPORT:")
-                print(json.dumps(rag_data, indent=2))
+                print(json.dumps(rag_data, indent=2, ensure_ascii=False))
                 
             print("="*40)
             

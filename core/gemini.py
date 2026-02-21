@@ -31,8 +31,8 @@ if not api_key:
 
 genai.configure(api_key=api_key)
 
-# FIX 1: Correct model name — "gemini-2.5-flash" alone may 404
-MODEL_NAME = "gemini-2.5-flash-preview-05-20"
+# FIX 1: Use the standard 2.5 flash model name
+MODEL_NAME = "gemini-2.5-flash"
 
 # FIX 2: NO response_mime_type in the main model config.
 # response_mime_type="application/json" BREAKS audio analysis because
@@ -499,7 +499,7 @@ Review this conversation analysis and generate a specific, actionable compliance
 {policies_block}
 
 ### Conversation Analysis
-{json.dumps(analysis_json, indent=2)}
+{json.dumps(analysis_json, indent=2, ensure_ascii=False)}
 
 Generate a structured action plan. Reference specific policy numbers.
 Priority must be exactly one of: P1 - Critical, P2 - High, P3 - Nominal

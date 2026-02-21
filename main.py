@@ -2,12 +2,25 @@
 VAJRA — Multimodal Conversation Intelligence Backend
 Main FastAPI application entry point.
 """
+import json
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes.analyze import router as analyze_router
 
+class UnicodeJSONResponse(JSONResponse):
+    def render(self, content) -> bytes:
+        return json.dumps(
+            content,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+        ).encode("utf-8")
+
 app = FastAPI(
     title="VAJRA — Conversation Intelligence API",
+    default_response_class=UnicodeJSONResponse,
     description="""
 ## Multimodal Conversation Intelligence Backend
 
@@ -50,7 +63,7 @@ def health_check():
     return {
         "status": "healthy",
         "service": "VAJRA Conversation Intelligence",
-        "model": "gemini-2.5-flash-preview-05-20",   # FIX: was wrong model name
+        "model": "gemini-2.5-flash",
         "version": "1.0.0",
         "phases": {
             "phase_1": "input validation + UUID assignment",
