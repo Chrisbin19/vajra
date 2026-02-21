@@ -1,3 +1,10 @@
+# ── Venv auto-bootstrap (run with any Python, always uses venv) ──────────────
+import sys, os as _os
+_venv_py = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "venv", "Scripts", "python.exe")
+if _os.path.isfile(_venv_py) and _venv_py != sys.executable:
+    import subprocess as _sp; sys.exit(_sp.run([_venv_py] + sys.argv).returncode)
+# ─────────────────────────────────────────────────────────────────────────────
+
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
@@ -6,6 +13,10 @@ import urllib.error
 import json
 import uuid
 import mimetypes
+import time
+import subprocess
+import os
+import atexit
 
 BASE_URL = "http://localhost:8000"
 
@@ -71,6 +82,37 @@ def analyze_audio(filepath):
 
 
 if __name__ == "__main__":
+    # ── Embedded server (subprocess with silenced output) ─────────────────────
+    # First check if a server is already running on port 8000
+    print("Initializing test environment...")
+    _server_proc = None
+    try:
+        urllib.request.urlopen(f"{BASE_URL}/health", timeout=1)
+        _existing_server = True
+    except Exception:
+        _existing_server = False
+
+    if not _existing_server:
+        print("Starting local API server in background...")
+        _DEVNULL = open(os.devnull, 'wb')
+        _server_proc = subprocess.Popen(
+            [sys.executable, "-m", "uvicorn", "main:app",
+             "--host", "127.0.0.1", "--port", "8000",
+             "--log-level", "critical", "--no-access-log"],
+            stdout=_DEVNULL, stderr=_DEVNULL
+        )
+        atexit.register(lambda: _server_proc.terminate() if _server_proc else None)
+
+        for _ in range(30):
+            try:
+                urllib.request.urlopen(f"{BASE_URL}/health", timeout=1)
+                break
+            except Exception:
+                time.sleep(0.5)
+        else:
+            print("❌ Server failed to start.")
+            sys.exit(1)
+
     print("=" * 50)
     print(" VAJRA PHASE 1 - INTERACTIVE TESTER ")
     print("=" * 50)
