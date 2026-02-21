@@ -110,7 +110,8 @@ async def analyze_audio(
 
     # ── Step 3: Generate ID ──
     conversation_id = str(uuid.uuid4())
-    client_id_stripped = client_id.strip()
+    # NOTE: client_id_stripped is resolved inside the if/elif below
+    # because client_id can be None when client_config is provided instead
 
     # ── Step 4: Build path ──
     temp_path = os.path.join(TEMP_AUDIO_DIR, f"{conversation_id}{file_ext}")
@@ -135,11 +136,11 @@ async def analyze_audio(
         except Exception:
             raise HTTPException(status_code=400, detail="Invalid JSON in client_config")
         policies = config.get("policies", [])
-        client_id_stripped = client_id.strip() if client_id else "custom"
+        client_id_resolved = client_id.strip() if client_id else "custom"   # ← use client_id_resolved
     elif client_id:
-        client_id_stripped = client_id.strip()
-        config = _get_client_config(client_id_stripped)
-        policies = _get_rag_policies(client_id_stripped)
+        client_id_resolved = client_id.strip()                               # ← use client_id_resolved
+        config = _get_client_config(client_id_resolved)
+        policies = _get_rag_policies(client_id_resolved)
     else:
         raise HTTPException(
             status_code=400,
@@ -148,7 +149,7 @@ async def analyze_audio(
     
     result = await gemini_service.analyze_audio(
         conversation_id=conversation_id,
-        client_id=client_id_stripped,
+        client_id=client_id_resolved,
         audio_path=temp_path,
         client_config=config,
         rag_policies=policies,
@@ -160,7 +161,7 @@ async def analyze_audio(
     # ── Step 7: Trigger Phase 3 RAG automatically ──
     print(f"[Phase 3][{conversation_id}] Automatically feeding Phase 2 JSON into Phase 3 RAG...")
     rag_actions = await gemini_service.analyze_json_for_rag(
-        client_id=client_id_stripped,
+        client_id=client_id_resolved,
         analysis_json=result.model_dump(),
         client_config=config,
         rag_policies=policies
@@ -183,7 +184,7 @@ async def analyze_text(request: TextAnalysisRequest):
     """
     # ── Step 1: Generate ID ──
     conversation_id = str(uuid.uuid4())
-    client_id_stripped = request.client_id.strip()
+    # NOTE: client_id is resolved inside the if/elif below
     
     # ── Step 2: Trigger Gemini Analysis (Phase 2) ──
     print(f"[Phase 2][{conversation_id}] Starting text analysis pipeline...")
@@ -191,11 +192,11 @@ async def analyze_text(request: TextAnalysisRequest):
     if request.client_config:
         config = request.client_config.model_dump()
         policies = config.get("policies", [])
-        client_id_stripped = request.client_id.strip() if request.client_id else "custom"
+        client_id_resolved = request.client_id.strip() if request.client_id else "custom"
     elif request.client_id:
-        client_id_stripped = request.client_id.strip()
-        config = _get_client_config(client_id_stripped)
-        policies = _get_rag_policies(client_id_stripped)
+        client_id_resolved = request.client_id.strip()
+        config = _get_client_config(client_id_resolved)
+        policies = _get_rag_policies(client_id_resolved)
     else:
         raise HTTPException(
             status_code=400,
@@ -204,7 +205,7 @@ async def analyze_text(request: TextAnalysisRequest):
     
     result = await gemini_service.analyze_text(
         conversation_id=conversation_id,
-        client_id=client_id_stripped,
+        client_id=client_id_resolved,
         transcript=request.transcript,
         client_config=config,
         rag_policies=policies,
@@ -217,7 +218,7 @@ async def analyze_text(request: TextAnalysisRequest):
     # ── Step 3: Trigger Phase 3 RAG automatically ──
     print(f"[Phase 3][{conversation_id}] Automatically feeding Phase 2 JSON into Phase 3 RAG...")
     rag_actions = await gemini_service.analyze_json_for_rag(
-        client_id=client_id_stripped,
+        client_id=client_id_resolved,
         analysis_json=result.model_dump(),
         client_config=config,
         rag_policies=policies

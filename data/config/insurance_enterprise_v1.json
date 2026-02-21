@@ -1,0 +1,29 @@
+{
+    "domain": "insurance",
+    "company_name": "LIC of India",
+    "products": [
+        "term life insurance",
+        "endowment plan",
+        "ULIP",
+        "health insurance",
+        "critical illness cover",
+        "pension plan",
+        "child education plan"
+    ],
+    "risk_triggers": [
+        "guaranteed returns",
+        "fixed returns",
+        "assured returns",
+        "risk-free investment",
+        "free look period",
+        "cancel policy",
+        "surrender",
+        "mis-selling",
+        "pressure",
+        "limited time",
+        "today only"
+    ],
+    "escalation_threshold": "high",
+    "regulator": "IRDAI",
+    "free_look_days": 15
+}

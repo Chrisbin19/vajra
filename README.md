@@ -1,67 +1,94 @@
-"""
-VAJRA — Multimodal Conversation Intelligence Backend
-Main FastAPI application entry point.
-"""
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from api.routes.analyze import router as analyze_router
+# VAJRA — Multimodal Conversation Intelligence Backend
 
-app = FastAPI(
-    title="VAJRA — Conversation Intelligence API",
-    description="""
-## Multimodal Conversation Intelligence Backend
+Analyzes customer support conversations (audio or text) using **Gemini 2.5 Flash** natively — no traditional speech-to-text or language-specific pipeline required.
 
-Analyzes customer support conversations (audio or text) using **Gemini 2.5 Flash**
-natively — no traditional speech-to-text or language-specific pipeline required.
+## Quick Start
+1. `pip install -r requirements.txt`
+2. Configure `.env` with `GEMINI_API_KEY` and `VAJRA_API_KEY`
+3. `uvicorn main:app --reload`
 
-### How It Works
-1. POST audio or text to `/api/v1/analyze/*`
-2. **Phase 1:** FastAPI validates input, assigns conversation_id
-3. **Phase 2:** Gemini 2.5 Flash analyzes natively — detects language, extracts insights, checks compliance against client RAG policies
-4. **Phase 3:** Phase 2 JSON fed back into Gemini for structured compliance action plan
-5. Returns complete enterprise-grade JSON
+## Authentication
+All endpoints require an **X-API-Key** header.
+```
+X-API-Key: vajra-2024-hackathon-transight
+```
 
-### Supported Inputs
-- **Audio:** MP3, WAV, OGG, M4A, FLAC, AAC, WebM (max 25MB)
-- **Text:** JSON transcript (min 10 characters)
+## Architecture Phases
+- **Phase 1** — Input validation + UUID assignment
+- **Phase 2** — Gemini 2.5 Flash native analysis
+- **Phase 3** — RAG compliance action plan
+- **Phase 4** — Rule-based compliance violation detection
 
-### 2. Supported Domains
-The system currently provides rule-based compliance evaluation for:
-- `banking_client_01` — Banking domain (RBI compliance rules)
-- `insurance_enterprise_v1` — Insurance domain (IRDAI compliance rules)
-    """,
-    version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
-)
+## API Endpoints
+| Endpoint | Method | Auth Required | Description |
+| --- | --- | --- | --- |
+| `/health` | GET | No | System health check |
+| `/api/v1/analyze/audio` | POST | Yes | Analyze audio recording with Gemini |
+| `/api/v1/analyze/text` | POST | Yes | Analyze text transcript with Gemini |
+| `/api/v1/analyze/json_rag` | POST | Yes | Process via Phase 3 RAG |
+| `/api/v1/compliance/check` | POST | Yes | Rule-based instant compliance check |
+| `/docs` | GET | No | OpenAPI interactive documentation |
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+## Project Structure
+```text
+project/
+├── api/
+│   ├── models/
+│   │   ├── request.py
+│   │   └── response.py
+│   └── routes/
+│       ├── analyze.py
+│       └── compliance.py
+├── core/
+│   ├── gemini.py
+│   └── compliance_engine.py
+├── data/
+│   ├── config/
+│   │   ├── banking_client_01.json
+│   │   └── insurance_enterprise_v1.json
+│   └── domain_knowledge/
+│       ├── banking_rules.txt
+│       └── insurance_rules.txt
+├── main.py
+└── .env.example
+```
 
-app.include_router(analyze_router, prefix="/api/v1", tags=["Conversation Analysis"])
+## Configuration Mechanism
+The system adapts per enterprise via the `data/` directory configuration:
+- `data/config/*.json` sets rules, severities, and expected domains.
+- `data/domain_knowledge/*.txt` sets the specific compliance strings passed to the rule-based compliance engine and the Phase 3 RAG logic.
 
+## Sample Requests
 
-@app.get("/health", tags=["System"])
-def health_check():
-    """System health check — confirms server is running and model config is loaded."""
-    return {
-        "status": "healthy",
-        "service": "VAJRA Conversation Intelligence",
-        "model": "gemini-2.5-flash-preview-05-20",   # FIX: was wrong model name
-        "version": "1.0.0",
-        "phases": {
-            "phase_1": "input validation + UUID assignment",
-            "phase_2": "Gemini 2.5 Flash native analysis",
-            "phase_3": "RAG compliance action plan",
-        },
-        "supported_inputs": [
-            "audio/mp3", "audio/wav", "audio/ogg",
-            "audio/m4a", "audio/flac", "audio/aac", "audio/webm",
-            "text/plain"
-        ],
-        "supported_clients": ["banking_client_01", "insurance_enterprise_v1"],
-    }
+### Rule-based Compliance Check
+```bash
+curl -X POST "http://localhost:8000/api/v1/compliance/check" \
+  -H "X-API-Key: vajra-2024-hackathon-transight" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": "banking_client_01",
+    "transcript": "Agent: Good morning. Customer: I shared my OTP with someone and Rs.85000 was transferred.",
+    "domain": "banking"
+  }'
+```
+
+### Full AI Analysis (Text)
+```bash
+curl -X POST "http://localhost:8000/api/v1/analyze/text" \
+  -H "X-API-Key: vajra-2024-hackathon-transight" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": "banking_client_01",
+    "transcript": "Agent: Good morning State Bank support. Customer: There is an unauthorized transaction of Rs.4200 on my account."
+  }'
+```
+
+## Bugs Fixed (Phase 4)
+| Component | Issue | Fix |
+| --- | --- | --- |
+| `api/routes/analyze.py` | Crash when `client_id` is None | Resolved `client_id` inside explicit if/elif configuration check, avoiding `.strip()` on None. |
+| `README.md` | Erroneously contained Python code | Replaced with robust Markdown documentation. |
+
+## Limitations and Future Improvements
+- Expand rule engine syntax.
+- Extend test coverage.
