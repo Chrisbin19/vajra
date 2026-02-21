@@ -74,6 +74,21 @@ def _build_analysis_prompt(
     for i, policy in enumerate(rag_policies, 1):
         policies_block += f"{i}. {policy}\n"
 
+    domain = client_config.get("industry", client_config.get("domain", "general"))
+    domain_instruction = ""
+    if domain == "insurance":
+        domain_instruction = """
+### Insurance Compliance Layer
+This is an insurance sales or support call. Apply these additional checks:
+1. Did agent disclose free-look period? If not, flag as IRDAI PPI Reg 7(5) violation.
+2. Did agent promise guaranteed or fixed returns? Flag as IRDAI PPI Reg 15(1) violation.
+3. Did agent describe investment product as risk-free? Flag as Suitability Rule violation.
+4. Did agent use urgency pressure tactics? Flag as IRDAI Pressure Tactics violation.
+5. Did agent disclose exclusions and pre-existing condition waiting periods?
+For each violation: include verbatim_quote from transcript, regulation reference, severity.
+Agent score for calls with 3+ violations must be in 10-35 range.
+"""
+
     transcript_block = ""
     if transcript and input_type == "text":
         transcript_block = f"\n### 3. Conversation Transcript\n{transcript}\n"
@@ -89,7 +104,7 @@ You are analyzing a customer support conversation ({input_type} input).
 - Escalation Threshold: {escalation_threshold}
 
 ### 2. Compliance Policies (RAG Retrieved — check conversation against EACH one)
-{policies_block}{transcript_block}
+{policies_block}{domain_instruction}{transcript_block}
 
 ### 4. Analysis Instructions
 

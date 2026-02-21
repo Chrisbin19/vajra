@@ -1,0 +1,33 @@
+IRDAI Protection of Policyholders Interests Regulations 2017 (Amended 2024)
+
+Regulation 7(5) — Free Look Period Disclosure (HIGH severity):
+Agent must verbally disclose free-look period before policy issuance.
+Life insurance: 15 days. Non-life: 30 days.
+Violation: dismissing or omitting free-look mention.
+Keywords: free look ka jhanjhat, free look is formality
+
+Regulation 15(1) — Guaranteed Returns Prohibition (HIGH severity):
+Agent cannot guarantee returns on any insurance product.
+Violation phrases: guaranteed returns, fixed returns, 12% guaranteed,
+double ho jayega guaranteed, 100% guaranteed, tax free guaranteed.
+
+Suitability Rule — Risk Disclosure Mandatory (HIGH severity):
+Agent must disclose investment risk on market-linked products.
+Violation: describing ULIP or investment insurance as risk free or FD jaisa.
+
+Urgency Pressure Tactics — Prohibited (MEDIUM severity):
+Violation phrases: offer khatam ho raha hai, kal tak nahi milega,
+aaj hi sign karo, manager quota, sign now, offer ends tomorrow.
+
+Mandatory disclosures every insurance call must include:
+- Policy exclusions
+- Pre-existing condition waiting period
+- Free-look period
+- Premium payment terms
+- Surrender charges if applicable
+- Risk factors for market-linked products
+
+IRDAI Grievance Framework:
+Mis-selling complaints resolved within 15 days.
+Free-look violation grants immediate cancellation with full refund.
+Penalties up to INR 1 crore per violation.

@@ -42,7 +42,8 @@ def _get_rag_policies(client_id: str) -> list[str]:
     """
     Returns compliance policies for the client from txt file (migrated from transight).
     """
-    rules_path = os.path.join("data", "domain_knowledge", f"{client_id}_rules.txt")
+    base_id = client_id.split("_client")[0].split("_enterprise")[0].split("_provider")[0]
+    rules_path = os.path.join("data", "domain_knowledge", f"{base_id}_rules.txt")
     try:
         with open(rules_path, 'r') as f:
             content = f.read()
