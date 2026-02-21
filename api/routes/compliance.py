@@ -1,21 +1,22 @@
 """
 VAJRA Phase 4 — Compliance Check API Routes
 
-POST /api/v1/compliance/check
-  - Fast rule-based check, returns in <100ms
-  - No Gemini API call — zero cost
-  - Accepts transcript + client_id (loads policies from file)
-    OR transcript + inline policies list
-"""
+Changes in this version:
+  - Added `from fastapi import ..., Depends`
+  - Added `from api.dependencies import verify_api_key`
+  - Added `api_key: str = Depends(verify_api_key)` to compliance_check endpoint
 
+All business logic is UNCHANGED from the previous working version.
+"""
 import json
 import os
 import uuid
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
 from core.compliance_engine import check_compliance, compliance_report_to_dict
+from api.dependencies import verify_api_key
 
 router = APIRouter()
 
@@ -83,7 +84,15 @@ def _load_config(client_id: str) -> dict:
     ),
     tags=["Compliance"],
 )
-async def compliance_check(request: ComplianceCheckRequest):
+async def compliance_check(
+    request: ComplianceCheckRequest,
+    api_key: str = Depends(verify_api_key),          # ← Phase 4: API key auth
+):
+    """
+    Phase 4 — Standalone rule-based compliance violation detection.
+    Per-policy result: COMPLIED | VIOLATED | UNCLEAR.
+    VIOLATED entries include evidence snippets, severity, and remediation.
+    """
     check_id = str(uuid.uuid4())
 
     if request.policies:

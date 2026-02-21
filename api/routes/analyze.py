@@ -1,13 +1,21 @@
 """
-API routes for VAJRA Phase 2 (Gemini Integration).
+API routes for VAJRA — Phases 2 & 3 (Gemini Analysis + RAG).
+
+Changes in this version:
+  - Added `from fastapi import ..., Depends`
+  - Added `from api.dependencies import verify_api_key`
+  - Added `api_key: str = Depends(verify_api_key)` to all 3 endpoints
+
+All business logic is UNCHANGED from the previous working version.
 """
 import os
 import uuid
 import aiofiles
-from fastapi import APIRouter, File, UploadFile, Form, HTTPException
+from fastapi import APIRouter, File, UploadFile, Form, HTTPException, Depends
 from typing import Optional
 from api.models.request import TextAnalysisRequest
 from api.models.response import ConversationAnalysisResult
+from api.dependencies import verify_api_key
 import core.gemini as gemini_service
 
 router = APIRouter()
@@ -21,15 +29,12 @@ os.makedirs(TEMP_AUDIO_DIR, exist_ok=True)
 import json
 
 def _get_client_config(client_id: str) -> dict:
-    """
-    Returns client domain config from JSON file (migrated from transight).
-    """
+    """Loads client domain config from data/config/{client_id}.json."""
     config_path = os.path.join("data", "config", f"{client_id}.json")
     try:
         with open(config_path, 'r') as f:
             return json.load(f)
     except FileNotFoundError:
-        # Default fallback if explicit config is not found
         return {
             "domain": "customer support",
             "company_name": client_id,
@@ -40,16 +45,12 @@ def _get_client_config(client_id: str) -> dict:
 
 
 def _get_rag_policies(client_id: str) -> list[str]:
-    """
-    Returns compliance policies for the client from txt file (migrated from transight).
-    """
+    """Loads compliance policies from data/domain_knowledge/{base_id}_rules.txt."""
     base_id = client_id.split("_client")[0].split("_enterprise")[0].split("_provider")[0]
     rules_path = os.path.join("data", "domain_knowledge", f"{base_id}_rules.txt")
     try:
         with open(rules_path, 'r') as f:
-            content = f.read()
-            # Split by newlines and filter out empty strings
-            return [line.strip() for line in content.split('\n') if line.strip()]
+            return [line.strip() for line in f.read().split('\n') if line.strip()]
     except FileNotFoundError:
         return [
             "Always acknowledge customer concern before providing solutions.",
@@ -58,25 +59,20 @@ def _get_rag_policies(client_id: str) -> list[str]:
 
 
 def _validate_audio_file(filename: str, file_size: int) -> str:
-    """
-    Validates extension and size. Returns file_ext if valid.
-    """
+    """Validates extension and size. Returns file_ext if valid."""
     _, ext = os.path.splitext(filename)
     file_ext = ext.lower()
-
     if file_ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400,
             detail=f"Unsupported file type: '{file_ext}'. Allowed formats: {sorted(list(ALLOWED_EXTENSIONS))}"
         )
-    
     if file_size > MAX_FILE_SIZE_BYTES:
         mb_size = file_size / (1024 * 1024)
         raise HTTPException(
             status_code=413,
-            detail=f"File too large: {mb_size:.2f}MB. Maximum allowed is {MAX_FILE_SIZE_BYTES / (1024*1024):.0f}MB."
+            detail=f"File too large: {mb_size:.2f}MB. Maximum allowed is 25MB."
         )
-
     return file_ext
 
 
@@ -85,32 +81,37 @@ def _validate_audio_file(filename: str, file_size: int) -> str:
     response_model=ConversationAnalysisResult,
     status_code=200,
     summary="Analyze a customer call audio recording with Gemini",
-    description="Uploads an audio file and returns a complete evaluation containing sentiment, entities, and agent performance."
+    description="Uploads an audio file and returns a complete evaluation containing sentiment, entities, and agent performance.",
 )
 async def analyze_audio(
     audio_file: UploadFile = File(...),
     client_id: Optional[str] = Form(None),
     client_config: Optional[str] = Form(None),
+    api_key: str = Depends(verify_api_key),          # ← Phase 4: API key auth
 ):
     """
-    Endpoint handling audio uploads. Validates the incoming audio file, saves it
-    temporarily, and triggers Gemini analysis.
+    Audio analysis pipeline (Phases 1 → 2 → 3):
+    1. Validate file extension + size
+    2. Save to temp_audio/
+    3. Load client config + RAG policies
+    4. Gemini 2.5 Flash native audio analysis (Phase 2)
+    5. Phase 3 RAG action plan (auto-triggered)
     """
     # ── Step 1: Read content and calculate size ──
     try:
         content = await audio_file.read()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to read file: {str(e)}")
-    
+
     file_size = len(content)
     await audio_file.seek(0)
-    
+
     # ── Step 2: Validate extension and size ──
     file_ext = _validate_audio_file(audio_file.filename or "unknown", file_size)
 
     # ── Step 3: Generate ID ──
     conversation_id = str(uuid.uuid4())
-    # NOTE: client_id_stripped is resolved inside the if/elif below
+    # NOTE: client_id_resolved is set inside the if/elif below
     # because client_id can be None when client_config is provided instead
 
     # ── Step 4: Build path ──
@@ -121,14 +122,11 @@ async def analyze_audio(
         async with aiofiles.open(temp_path, "wb") as f:
             await f.write(content)
     except Exception as e:
-        print(f"Error saving file for {conversation_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to save audio to temp storage")
 
-    # ── Step 6: Trigger Gemini Analysis (Phase 2) ──
+    # ── Step 6: Resolve client config + policies ──
     print(f"[Phase 2][{conversation_id}] Starting audio analysis pipeline...")
-    # Use provided config directly, or load from file
     if client_config:
-        import json
         from api.models.request import ClientConfigModel
         try:
             raw_config = json.loads(client_config) if isinstance(client_config, str) else client_config
@@ -136,9 +134,9 @@ async def analyze_audio(
         except Exception:
             raise HTTPException(status_code=400, detail="Invalid JSON in client_config")
         policies = config.get("policies", [])
-        client_id_resolved = client_id.strip() if client_id else "custom"   # ← use client_id_resolved
+        client_id_resolved = client_id.strip() if client_id else "custom"
     elif client_id:
-        client_id_resolved = client_id.strip()                               # ← use client_id_resolved
+        client_id_resolved = client_id.strip()
         config = _get_client_config(client_id_resolved)
         policies = _get_rag_policies(client_id_resolved)
     else:
@@ -146,7 +144,8 @@ async def analyze_audio(
             status_code=400,
             detail="Either client_id or client_config must be provided"
         )
-    
+
+    # ── Step 7: Phase 2 — Gemini analysis ──
     result = await gemini_service.analyze_audio(
         conversation_id=conversation_id,
         client_id=client_id_resolved,
@@ -154,11 +153,11 @@ async def analyze_audio(
         client_config=config,
         rag_policies=policies,
     )
-    
+
     if result.status == "failed":
         raise HTTPException(status_code=500, detail=f"Analysis failed: {result.error}")
-        
-    # ── Step 7: Trigger Phase 3 RAG automatically ──
+
+    # ── Step 8: Phase 3 — RAG action plan ──
     print(f"[Phase 3][{conversation_id}] Automatically feeding Phase 2 JSON into Phase 3 RAG...")
     rag_actions = await gemini_service.analyze_json_for_rag(
         client_id=client_id_resolved,
@@ -167,7 +166,7 @@ async def analyze_audio(
         rag_policies=policies
     )
     result.rag_actions = rag_actions
-    
+
     return result
 
 
@@ -176,19 +175,24 @@ async def analyze_audio(
     response_model=ConversationAnalysisResult,
     status_code=200,
     summary="Analyze a text conversation transcript with Gemini",
-    description="Accepts text-based customer transcripts and returns a complete evaluation containing sentiment, entities, and agent performance."
+    description="Accepts text-based customer transcripts and returns a complete evaluation containing sentiment, entities, and agent performance.",
 )
-async def analyze_text(request: TextAnalysisRequest):
+async def analyze_text(
+    request: TextAnalysisRequest,
+    api_key: str = Depends(verify_api_key),          # ← Phase 4: API key auth
+):
     """
-    Endpoint handling text transcript submissions. Triggers Gemini analysis instantly.
+    Text analysis pipeline (Phases 1 → 2 → 3):
+    1. Resolve client config + RAG policies
+    2. Gemini 2.5 Flash text analysis (Phase 2)
+    3. Phase 3 RAG action plan (auto-triggered)
     """
     # ── Step 1: Generate ID ──
     conversation_id = str(uuid.uuid4())
-    # NOTE: client_id is resolved inside the if/elif below
-    
-    # ── Step 2: Trigger Gemini Analysis (Phase 2) ──
+    # NOTE: client_id_resolved is set inside the if/elif below
+
+    # ── Step 2: Resolve config + policies ──
     print(f"[Phase 2][{conversation_id}] Starting text analysis pipeline...")
-    # Use provided config directly, or load from file
     if request.client_config:
         config = request.client_config.model_dump()
         policies = config.get("policies", [])
@@ -202,7 +206,8 @@ async def analyze_text(request: TextAnalysisRequest):
             status_code=400,
             detail="Either client_id or client_config must be provided"
         )
-    
+
+    # ── Step 3: Phase 2 — Gemini analysis ──
     result = await gemini_service.analyze_text(
         conversation_id=conversation_id,
         client_id=client_id_resolved,
@@ -210,12 +215,11 @@ async def analyze_text(request: TextAnalysisRequest):
         client_config=config,
         rag_policies=policies,
     )
-    
-    
+
     if result.status == "failed":
         raise HTTPException(status_code=500, detail=f"Analysis failed: {result.error}")
-        
-    # ── Step 3: Trigger Phase 3 RAG automatically ──
+
+    # ── Step 4: Phase 3 — RAG action plan ──
     print(f"[Phase 3][{conversation_id}] Automatically feeding Phase 2 JSON into Phase 3 RAG...")
     rag_actions = await gemini_service.analyze_json_for_rag(
         client_id=client_id_resolved,
@@ -224,7 +228,7 @@ async def analyze_text(request: TextAnalysisRequest):
         rag_policies=policies
     )
     result.rag_actions = rag_actions
-        
+
     return result
 
 
@@ -234,30 +238,28 @@ from api.models.request import JsonRagRequest
     "/analyze/json_rag",
     status_code=200,
     summary="Process Phase 2 JSON output through Phase 3 RAG",
-    description="Accepts the JSON output from a previous analysis and feeds it into the RAG system to generate a final recommendation based on domain rules."
+    description="Accepts the JSON output from a previous analysis and feeds it into the RAG system to generate a final recommendation based on domain rules.",
 )
-async def analyze_json_rag(request: JsonRagRequest):
-    """
-    Endpoint handling JSON transcript submissions for Phase 3 RAG analysis.
-    """
+async def analyze_json_rag(
+    request: JsonRagRequest,
+    api_key: str = Depends(verify_api_key),          # ← Phase 4: API key auth
+):
+    """Phase 3 RAG on pre-existing Phase 2 JSON output."""
     client_id_stripped = request.client_id.strip()
-    
+
     print(f"\n{'='*50}")
     print(f"[Phase 3] Starting Post-Analysis RAG for client: {client_id_stripped}")
-    
-    # Load domain config and rules
+
     client_config = _get_client_config(client_id_stripped)
     rag_policies = _get_rag_policies(client_id_stripped)
-    
-    # Call the new gemini service function
+
     result = await gemini_service.analyze_json_for_rag(
         client_id=client_id_stripped,
         analysis_json=request.analysis_data,
         client_config=client_config,
         rag_policies=rag_policies
     )
-    
-    # Return the raw dict
+
     return {
         "status": "success",
         "client_id": client_id_stripped,
