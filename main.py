@@ -1,5 +1,5 @@
 """
-VAJRA — Multimodal Conversation Intelligence Backend
+NEXUS — Multimodal Conversation Intelligence Backend
 Main FastAPI application entry point.
 
 Auth approach: FastAPI Security/Depends on each endpoint (NOT middleware).
@@ -103,7 +103,7 @@ def health_check():
     env_key_set = bool(os.getenv("VAJRA_API_KEY"))
     return {
         "status": "healthy",
-        "service": "VAJRA Conversation Intelligence",
+        "service": "NEXUS Conversation Intelligence",
         "model": "gemini-2.5-flash",
         "version": "1.0.0",
         "auth": {

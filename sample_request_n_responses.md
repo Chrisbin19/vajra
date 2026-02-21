@@ -1,6 +1,6 @@
 # NEXUS — Sample Requests & Responses
 
-All responses below are **real, unmodified system output** captured from the live VAJRA API on 2026-02-21.
+All responses below are **real, unmodified system output** captured from the live NEXUS API on 2026-02-21.
 
 ## How To Use These Samples
 
@@ -413,7 +413,7 @@ curl http://localhost:8000/health
 ```json
 {
   "status": "healthy",
-  "service": "VAJRA Conversation Intelligence",
+  "service": "NEXUS Conversation Intelligence",
   "model": "gemini-2.5-flash",
   "version": "1.0.0",
   "supported_inputs": [
