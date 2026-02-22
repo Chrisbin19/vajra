@@ -97,21 +97,8 @@ def analyze_audio(filepath):
 
 
 def print_result(result):
-    """Prints Phase 2 analysis and Phase 3 RAG report separately."""
-    phase2 = copy.deepcopy(result)
-    rag_data = phase2.pop('rag_actions', None)
-
-    print("\n" + "=" * 50)
-    print("API RESPONSE — PHASE 2 (CONVERSATION ANALYSIS):")
-    print("=" * 50)
-    print(json.dumps(phase2, indent=2, ensure_ascii=False))
-
-    if rag_data:
-        print("\n" + "=" * 50)
-        print("PHASE 3 — RAG COMPLIANCE ACTION PLAN:")
-        print("=" * 50)
-        print(json.dumps(rag_data, indent=2, ensure_ascii=False))
-    print("=" * 50)
+    """Prints raw JSON result without extra formatting."""
+    print(json.dumps(result, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

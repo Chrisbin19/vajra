@@ -22,6 +22,7 @@ class EntityExtraction(BaseModel):
 
 class ComplianceCheck(BaseModel):
     violations_detected: List[str] = Field(..., description="Specific compliance violations found during the call")
+    compliance_notes: str = Field(..., description="Notes on compliance, e.g. 'No violations detected. The agent adhered to standard resolution workflows.'")
     policies_checked: List[str] = Field(..., description="Which RAG policies were actively evaluated against this conversation")
     risk_level: str = Field(..., description="'low' | 'medium' | 'high' | 'critical'")
     escalation_required: bool = Field(..., description="True if this call requires immediate human supervisor review")
@@ -124,6 +125,7 @@ class ConversationAnalysisResult(BaseModel):
                 },
                 "compliance": {
                     "violations_detected": [],
+                    "compliance_notes": "No violations detected. The agent adhered to standard resolution workflows, remained professional, and did not breach any security protocols.",
                     "policies_checked": ["Identity Verification", "Card Blocking Protocol"],
                     "risk_level": "medium",
                     "escalation_required": False,

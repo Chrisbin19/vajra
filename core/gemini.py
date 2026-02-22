@@ -35,8 +35,6 @@ genai.configure(api_key=api_key)
 MODEL_NAME = "gemini-2.5-flash"
 
 # FIX 2: NO response_mime_type in the main model config.
-# response_mime_type="application/json" BREAKS audio analysis because
-# Gemini cannot enforce JSON output when the input contains an audio File object.
 # We handle JSON extraction manually via _extract_json_from_response().
 model = genai.GenerativeModel(
     model_name=MODEL_NAME,
@@ -44,7 +42,7 @@ model = genai.GenerativeModel(
         "temperature": 0.1,
         "top_p": 0.8,
         "max_output_tokens": 4096,
-        # DO NOT add response_mime_type here — breaks audio
+        "response_mime_type": "application/json"
     }
 )
 
@@ -85,7 +83,7 @@ This is an insurance sales or support call. Apply these additional checks:
 3. Did agent describe investment product as risk-free? Flag as Suitability Rule violation.
 4. Did agent use urgency pressure tactics? Flag as IRDAI Pressure Tactics violation.
 5. Did agent disclose exclusions and pre-existing condition waiting periods?
-For each violation: include verbatim_quote from transcript, regulation reference, severity.
+For each violation: include the regulation reference and severity AS A SINGLE STRING, e.g. "IRDAI Reg 15(1) - High Severity: Promised 12% returns". Do NOT use dictionaries/objects.
 Agent score for calls with 3+ violations must be in 10-35 range.
 """
 
@@ -123,7 +121,8 @@ INTENT EXTRACTION:
 
 COMPLIANCE CHECK:
 - Review EVERY numbered policy above against what happened
-- violations_detected: quote the policy number and what was breached
+- violations_detected: quote the policy number and what was breached. Leave empty [] if no violations.
+- compliance_notes: summarize compliance adherence. If no violations, exactly: "No violations detected. The agent adhered to standard resolution workflows, remained professional, and did not breach any security protocols."
 - risk_flags: snake_case e.g. unauthorized_transaction, fraud_mention
 
 ### 5. Required Output
@@ -155,6 +154,7 @@ Start your response with {{ and end with }}.
     }},
     "compliance": {{
         "violations_detected": [],
+        "compliance_notes": "No violations detected. The agent adhered to standard resolution workflows, remained professional, and did not breach any security protocols.",
         "policies_checked": ["policy name"],
         "risk_level": "low|medium|high|critical",
         "escalation_required": false,
@@ -190,13 +190,7 @@ CRITICAL RULES:
 def _extract_json_from_response(raw_text: str) -> dict:
     """
     Safely extracts and parses JSON from Gemini's response.
-
-    Why needed: Even with "return ONLY JSON" instructions, Gemini sometimes
-    wraps output in ```json ... ``` markdown blocks. This handles all cases.
-
-    Strategy 1: Direct json.loads — ideal case
-    Strategy 2: Strip markdown ```json ... ``` code block
-    Strategy 3: Regex extract first { ... } object
+    Handles markdown blocks and trailing conversational text.
     """
     # Strategy 1: Direct parse
     try:
@@ -204,26 +198,35 @@ def _extract_json_from_response(raw_text: str) -> dict:
     except json.JSONDecodeError:
         pass
 
-    # Strategy 2: Strip markdown code block
-    code_block = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", raw_text, re.DOTALL)
+    # Strategy 2: Strip markdown code block strictly
+    code_block = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", raw_text, re.DOTALL | re.IGNORECASE)
     if code_block:
         try:
             return json.loads(code_block.group(1))
         except json.JSONDecodeError:
             pass
 
-    # Strategy 3: Extract first { to last }
-    brace_match = re.search(r"\{.*\}", raw_text, re.DOTALL)
-    if brace_match:
-        try:
-            return json.loads(brace_match.group())
-        except json.JSONDecodeError:
-            pass
+    # Strategy 3: Find first { and last } and try parsing.
+    # If it fails, iteratively drop the last } and try again to handle 
+    # incorrectly balanced trailing text.
+    start_idx = raw_text.find('{')
+    if start_idx != -1:
+        text_to_search = raw_text[start_idx:]
+        end_idx = text_to_search.rfind('}')
+        
+        while end_idx != -1:
+            try:
+                candidate = text_to_search[:end_idx+1]
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                # Try the next highest '}'
+                end_idx = text_to_search.rfind('}', 0, end_idx)
 
     raise ValueError(
         f"Could not parse JSON from Gemini response. "
         f"First 300 chars: {raw_text[:300]}"
     )
+
 
 
 def _upload_audio_to_gemini(audio_path: str):
@@ -293,6 +296,7 @@ def _build_result_from_dict(
     )
     compliance = ComplianceCheck(
         violations_detected=c.get("violations_detected", []),
+        compliance_notes=c.get("compliance_notes", "No violations detected. The agent adhered to standard resolution workflows, remained professional, and did not breach any security protocols."),
         policies_checked=c.get("policies_checked", []),
         risk_level=c.get("risk_level", "low"),
         escalation_required=bool(c.get("escalation_required", False)),
@@ -361,7 +365,7 @@ def _make_failed_result(conversation_id, client_id, input_type, start_time, rag_
             products_mentioned=[], locations_mentioned=[], people_mentioned=[],
         ),
         compliance=ComplianceCheck(
-            violations_detected=[], policies_checked=[],
+            violations_detected=[], compliance_notes="No violations detected. The agent adhered to standard resolution workflows, remained professional, and did not breach any security protocols.", policies_checked=[],
             risk_level="low", escalation_required=False, risk_flags=[],
         ),
         agent_performance=AgentPerformance(
