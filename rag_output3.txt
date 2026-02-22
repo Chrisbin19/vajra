@@ -1,0 +1,14 @@
+Sending Phase 2 JSON output to Phase 3 RAG endpoint...
+
+SUCCESS!
+{
+  "suggested_actions": [
+    "Review the escalated conversation to understand the customer's underlying issue and ensure proper resolution.",
+    "Follow up on the customer's request for a supervisor to ensure timely contact and resolution.",
+    "Provide agent with additional training on handling immediate escalation demands and de-escalation techniques for highly frustrated customers."
+  ],
+  "priority": "P2 - High",
+  "policy_justifications": [],
+  "human_review_needed": false,
+  "coaching_notes": "The agent initiated a proper greeting but was immediately interrupted by a highly frustrated customer demanding a supervisor. While the agent had little opportunity to act, future training could focus on quickly acknowledging extreme customer frustration and confirming the immediate escalation path when a supervisor is demanded, even if the underlying issue is unknown."
+}

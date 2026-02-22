@@ -1,45 +1,11 @@
-Customer:
-Hi, I’m really upset right now. I placed an order three days ago, the money was deducted from my account, but I haven’t received the product yet. This is not acceptable.
-
-Agent:
-I’m very sorry to hear that you’re experiencing this. I understand how concerning it can be when money is deducted and the order hasn’t arrived. Let me look into this for you right away.
-
-Customer:
-This is the second time this has happened. I paid ₹8,499 for a wireless headset, and the amount was debited immediately. My bank shows the transaction was successful, but your app says “processing.”
-
-Agent:
-Thank you for sharing those details. May I please have your order ID or the registered phone number so I can check the status?
-
-Customer:
-Yes, the order ID is ORD4589217. The payment was made using my debit card ending with 7834.
-
-Agent:
-Thank you. Please allow me a moment while I check the system.
-
-(Short pause)
-
-I can see the order here. It appears the payment was received successfully, but there was a delay in warehouse dispatch due to a system update. I sincerely apologize for the inconvenience.
-
-Customer:
-But why wasn’t I informed? My money has been stuck for three days. What if I never receive it? I’m honestly worried I’ve lost my money.
-
-Agent:
-I completely understand your concern. Please be assured that your payment is secure and linked to your order. You have not lost your money. The order is scheduled for dispatch within the next 24 hours.
-
-Customer:
-If I don’t get it tomorrow, I want a full refund immediately. I can’t afford to just lose ₹8,499 like this.
-
-Agent:
-That is absolutely fair. If the order is not dispatched within 24 hours, we will initiate a full refund to your original payment method. I will personally mark this order as high priority and send you a confirmation email shortly.
-
-Customer:
-Okay… I just want this resolved quickly. I’ve had a stressful week already.
-
-Agent:
-I completely understand. Thank you for your patience. I’ve escalated the case to our logistics team, and you will receive a tracking update soon. Is there anything else I can assist you with today?
-
-Customer:
-No, that’s all. Please just make sure this gets fixed.
-
-Agent:
-Absolutely. We appreciate your trust, and we’ll ensure this is resolved promptly. Have a good day, and please feel free to reach out if you need further assistance.
+ഏജന്റ്: സുപ്രഭാതം, സ്റ്റേറ്റ് ബാങ്ക് കസ്റ്റമർ സപ്പോർട്ട്, ഇതാണ് പ്രിയ. ഇന്ന് എനിക്ക് നിങ്ങളെ എങ്ങനെ സഹായിക്കാനാകും?
+ഉപഭോക്താവ്: ഹായ് പ്രിയ, എനിക്ക് വളരെ വിഷമമുണ്ട്. ഞാൻ ഇപ്പോൾ എന്റെ അക്കൗണ്ട് പരിശോധിച്ചു, ജനുവരി 14 ന് 4200 രൂപയുടെ അനധികൃത ഇടപാട് നടന്നു. ഞാൻ ഒരിക്കലും ഈ പണമടച്ചില്ല!
+ഏജന്റ്: നിങ്ങളുടെ ആശങ്ക എനിക്ക് പൂർണ്ണമായും മനസ്സിലാകും, ഇത് ഉണ്ടാക്കിയ ബുദ്ധിമുട്ടിന് ഞാൻ ആത്മാർത്ഥമായി ക്ഷമ ചോദിക്കുന്നു. ഇത് ഉടൻ പരിഹരിക്കാൻ ഞാൻ നിങ്ങളെ സഹായിക്കട്ടെ. എനിക്ക് ആദ്യം നിങ്ങളുടെ ഐഡന്റിറ്റി പരിശോധിക്കാൻ കഴിയുമോ? ദയവായി നിങ്ങളുടെ അക്കൗണ്ട് നമ്പറിന്റെ അവസാന 4 അക്കങ്ങൾ എനിക്ക് നൽകാമോ?
+ഉപഭോക്താവ്: അതെ, അത് 7823 ആണ്.
+ഏജന്റ്: നന്ദി, മിസ്റ്റർ ശർമ്മ. ഞാൻ നിങ്ങളുടെ ഐഡന്റിറ്റി പരിശോധിച്ചു. ജനുവരി 14 ന് 4200 രൂപയുടെ സംശയാസ്പദമായ ഇടപാട് എനിക്ക് കാണാൻ കഴിയും. അത് ഒരു അജ്ഞാത വ്യാപാരിയിൽ നിന്നാണെന്ന് തോന്നുന്നു.
+ഉപഭോക്താവ്: അതെ! ഞാൻ ആ ദിവസം വീട്ടിലായിരുന്നു, ഞാൻ ഒരിക്കലും കാർഡ് ഉപയോഗിച്ചിട്ടില്ല. ദയവായി എന്റെ കാർഡ് ബ്ലോക്ക് ചെയ്യാമോ? കൂടുതൽ ഇടപാടുകൾ ഉണ്ടാകുമെന്ന് ഞാൻ ഭയപ്പെടുന്നു.
+ഏജന്റ്: തീർച്ചയായും. ഞാൻ ഇപ്പോൾ നിങ്ങളുടെ ഡെബിറ്റ് കാർഡ് ബ്ലോക്ക് ചെയ്യുകയാണ് - അത് കഴിഞ്ഞു. ഏകദേശം 30 സെക്കൻഡിനുള്ളിൽ നിങ്ങൾക്ക് ഒരു SMS സ്ഥിരീകരണം ലഭിക്കും. ഈ 4200 രൂപയുടെ ഇടപാടിനുള്ള ഒരു തർക്ക ടിക്കറ്റും ഞാൻ ഉന്നയിക്കുന്നുണ്ട്. നിങ്ങളുടെ ടിക്കറ്റ് നമ്പർ DIS-2024-09821 ആണ്. തർക്ക പരിഹാര സംഘം 7 പ്രവൃത്തി ദിവസങ്ങൾക്കുള്ളിൽ ഇത് അവലോകനം ചെയ്യും.
+ഉപഭോക്താവ്: വളരെ നന്ദി പ്രിയ. അടുത്തതായി ഞാൻ എന്തുചെയ്യണം?
+ഏജന്റ്: 3-5 പ്രവൃത്തി ദിവസങ്ങൾക്കുള്ളിൽ നിങ്ങളുടെ രജിസ്റ്റർ ചെയ്ത വിലാസത്തിൽ നിങ്ങൾക്ക് ഒരു പുതിയ ഡെബിറ്റ് കാർഡ് ലഭിക്കും. അതേസമയം, ഇടപാടുകൾക്കായി നിങ്ങൾക്ക് UPI അല്ലെങ്കിൽ നെറ്റ് ബാങ്കിംഗ് ഉപയോഗിക്കാം. മറ്റേതെങ്കിലും ഇടപാടുകൾ സംശയാസ്പദമായി തോന്നുന്നുണ്ടോ എന്ന് പരിശോധിച്ച് ഞങ്ങളെ അറിയിക്കാനും ഞാൻ ശുപാർശ ചെയ്യുന്നു. ഇന്ന് എനിക്ക് നിങ്ങളെ സഹായിക്കാൻ കഴിയുന്ന മറ്റെന്തെങ്കിലും ഉണ്ടോ?
+ഉപഭോക്താവ്: ഇല്ല, അത്രമാത്രം. പെട്ടെന്നുള്ള സഹായത്തിന് നന്ദി, ഇപ്പോൾ എനിക്ക് വളരെ സുഖം തോന്നുന്നു.
+ഏജന്റ്: നിങ്ങൾക്ക് സ്വാഗതം, മിസ്റ്റർ ശർമ്മ. നിങ്ങൾക്ക് ഇത് പരിഹരിക്കാൻ കഴിഞ്ഞതിൽ എനിക്ക് സന്തോഷമുണ്ട്. സുരക്ഷിതമായ ഒരു ദിവസം ആശംസിക്കുന്നു. വിട!

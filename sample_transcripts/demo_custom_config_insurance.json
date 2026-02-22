@@ -1,0 +1,22 @@
+{
+    "client_id": null,
+    "client_config": {
+        "domain": "Insurance",
+        "company_name": "SafeLife Shield",
+        "products": [
+            "Term Life",
+            "Health Insurance"
+        ],
+        "policies": [
+            "Agent must clearly explain that pre-existing conditions have a 24-month waiting period.",
+            "Agent must confirm the customer understands the 15-day free-look period for canceling the policy.",
+            "Agent must never guarantee approval before medical underwriting."
+        ],
+        "risk_triggers": [
+            "guaranteed approval",
+            "no waiting period",
+            "cash back"
+        ]
+    },
+    "transcript": "Agent: Welcome to SafeLife Shield. This new health plan covers everything from day one, there is absolutely no waiting period even for pre-existing conditions.\nCustomer: Wow, really? Even for my asthma?\nAgent: Yes, absolutely! Plus, we have guaranteed approval if you give me your card details on today's call."
+}

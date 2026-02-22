@@ -1,0 +1,88 @@
+{
+  "conversation_id": "ce4a8e0f-57a2-4bd8-b42c-f8f97c4db436",
+  "client_id": "banking_client_01",
+  "input_type": "text",
+  "status": "completed",
+  "processing_time_ms": 7917,
+  "summary": "The conversation began with the agent offering assistance. The customer stated they had a question about their balance but immediately confirmed that everything was resolved and thanked the agent.",
+  "language_detected": "en",
+  "languages_all": [
+    "en"
+  ],
+  "sentiment": {
+    "overall": "positive",
+    "sentiment_score": 0.8,
+    "customer_sentiment": "The customer was initially neutral with a question, then quickly became satisfied and thankful as their issue was already resolved.",
+    "agent_sentiment": "The agent maintained a professional and helpful tone.",
+    "emotional_arc": [
+      "neutral",
+      "satisfied"
+    ],
+    "frustration_detected": false
+  },
+  "primary_intent": "check_balance",
+  "secondary_intents": [],
+  "topics_discussed": [
+    "balance_inquiry",
+    "issue_resolution"
+  ],
+  "entities": {
+    "amounts_mentioned": [],
+    "dates_mentioned": [],
+    "account_references": [],
+    "products_mentioned": [],
+    "locations_mentioned": [],
+    "people_mentioned": []
+  },
+  "compliance": {
+    "violations_detected": [],
+    "compliance_notes": "No violations detected. The agent adhered to standard resolution workflows, remained professional, and did not breach any security protocols.",
+    "policies_checked": [
+      "PCI-DSS Requirement",
+      "Fraud Triggers"
+    ],
+    "risk_level": "low",
+    "escalation_required": false,
+    "risk_flags": []
+  },
+  "agent_performance": {
+    "score": 90,
+    "greeting_proper": true,
+    "empathy_shown": true,
+    "issue_resolved": true,
+    "call_outcome": "resolved",
+    "strengths": [
+      "Proper greeting",
+      "Efficient interaction"
+    ],
+    "improvements": []
+  },
+  "speakers": {
+    "speakers_detected": 2,
+    "speaker_labels": [
+      "Agent",
+      "Customer"
+    ],
+    "language_per_speaker": {
+      "Agent": "en",
+      "Customer": "en"
+    }
+  },
+  "rag_policies_used": [
+    "PCI-DSS Requirement: Sensitive authentication data cannot be retained.",
+    "Fraud Triggers: Flag any conversation where the customer mentions \"unauthorized transaction\", \"stolen card\", or \"hacked account\"."
+  ],
+  "rag_actions": {
+    "suggested_actions": [
+      "No specific actions are required as all policies were adhered to and the conversation was resolved without issues."
+    ],
+    "priority": "P3 - Nominal",
+    "policy_justifications": [
+      "PCI-DSS Requirement: No sensitive authentication data was mentioned or retained during the conversation.",
+      "Fraud Triggers: The customer did not mention any keywords such as \"unauthorized transaction\", \"stolen card\", or \"hacked account\"."
+    ],
+    "human_review_needed": false,
+    "coaching_notes": "The agent handled this brief interaction professionally. Continue to maintain a helpful and professional demeanor even when customer issues are self-resolved."
+  },
+  "error": null
+}

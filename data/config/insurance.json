@@ -1,0 +1,40 @@
+{
+  "client_id": "insurance_enterprise_v1",
+  "industry": "insurance",
+  "domain": "insurance",
+  "language_preferences": {
+    "auto_detect": true,
+    "supported_languages": ["en", "hi", "ta", "te", "ml"]
+  },
+  "compliance": {
+    "pii_redaction": true,
+    "regulatory_requirements": ["IRDAI_PPI_2017", "IRDAI_PPI_2024", "IRDAI_Grievance_2024"]
+  },
+  "analysis_preferences": {
+    "sentiment_analysis": true,
+    "misselling_detection": true,
+    "compliance_flagging": true,
+    "intent_detection": true,
+    "suitability_check": true
+  },
+  "escalation_rules": {
+    "high_risk_keywords": [
+      {"keyword": "guaranteed returns", "severity": "high", "policy_reference": "IRDAI PPI Reg 15(1)"},
+      {"keyword": "fixed returns", "severity": "high", "policy_reference": "IRDAI PPI Reg 15(1)"},
+      {"keyword": "100% guaranteed", "severity": "high", "policy_reference": "IRDAI PPI Reg 15(1)"},
+      {"keyword": "double ho jayega", "severity": "high", "policy_reference": "IRDAI PPI Reg 15(1)"},
+      {"keyword": "risk free", "severity": "high", "policy_reference": "IRDAI Suitability Rule"},
+      {"keyword": "tension mat lo", "severity": "high", "policy_reference": "IRDAI Misselling Guidelines"},
+      {"keyword": "free look ka jhanjhat", "severity": "high", "policy_reference": "IRDAI PPI Reg 7(5)"},
+      {"keyword": "offer khatam", "severity": "medium", "policy_reference": "IRDAI Pressure Tactics"},
+      {"keyword": "kal tak nahi milega", "severity": "medium", "policy_reference": "IRDAI Pressure Tactics"},
+      {"keyword": "sign karo", "severity": "medium", "policy_reference": "IRDAI Pressure Tactics"},
+      {"keyword": "guaranteed", "severity": "medium", "policy_reference": "IRDAI PPI Reg 15(1)"},
+      {"keyword": "sign now", "severity": "medium", "policy_reference": "IRDAI Pressure Tactics"},
+      {"keyword": "offer ends", "severity": "medium", "policy_reference": "IRDAI Pressure Tactics"},
+      {"keyword": "free look is formality", "severity": "high", "policy_reference": "IRDAI PPI Reg 7(5)"}
+    ],
+    "auto_escalate": true,
+    "notify_roles": ["compliance_officer", "CCO", "grievance_team"]
+  }
+}

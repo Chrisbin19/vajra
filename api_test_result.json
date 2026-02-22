@@ -1,0 +1,89 @@
+﻿{
+    "conversation_id":  "551c717f-5ba4-4a06-86fc-677cdcbf3968",
+    "client_id":  "banking",
+    "input_type":  "text",
+    "status":  "completed",
+    "processing_time_ms":  8265,
+    "summary":  "The customer reports a lost wallet and requests immediate blocking of their card. This is a critical security request requiring prompt action.",
+    "language_detected":  "en",
+    "languages_all":  [
+                          "en"
+                      ],
+    "sentiment":  {
+                      "overall":  "neutral",
+                      "customer_sentiment":  "neutral",
+                      "agent_sentiment":  "neutral",
+                      "emotional_arc":  [
+                                            "neutral_start"
+                                        ],
+                      "frustration_detected":  false
+                  },
+    "customer_intents":  [
+                             "block_card"
+                         ],
+    "topics_discussed":  [
+                             "card_security",
+                             "lost_items"
+                         ],
+    "entities":  {
+                     "amounts_mentioned":  [
+
+                                           ],
+                     "dates_mentioned":  [
+
+                                         ],
+                     "account_references":  [
+
+                                            ],
+                     "products_mentioned":  [
+                                                "card"
+                                            ],
+                     "locations_mentioned":  [
+
+                                             ],
+                     "people_mentioned":  [
+
+                                          ]
+                 },
+    "compliance":  {
+                       "violations_detected":  [
+
+                                               ],
+                       "policies_checked":  [
+                                                "PCI-DSS Requirement",
+                                                "Fraud Triggers"
+                                            ],
+                       "risk_level":  "high",
+                       "escalation_required":  false,
+                       "risk_flags":  [
+                                          "lost_wallet"
+                                      ]
+                   },
+    "agent_performance":  {
+                              "score":  0,
+                              "greeting_proper":  false,
+                              "empathy_shown":  false,
+                              "issue_resolved":  false,
+                              "call_outcome":  "dropped",
+                              "strengths":  [
+
+                                            ],
+                              "improvements":  [
+
+                                               ]
+                          },
+    "speakers":  {
+                     "speakers_detected":  1,
+                     "speaker_labels":  [
+                                            "customer"
+                                        ],
+                     "language_per_speaker":  {
+                                                  "customer":  "en"
+                                              }
+                 },
+    "rag_policies_used":  [
+                              "PCI-DSS Requirement: Sensitive authentication data cannot be retained.",
+                              "Fraud Triggers: Flag any conversation where the customer mentions \"unauthorized transaction\", \"stolen card\", or \"hacked account\"."
+                          ],
+    "error":  null
+}

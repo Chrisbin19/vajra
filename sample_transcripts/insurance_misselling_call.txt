@@ -1,0 +1,11 @@
+Agent: Namaste, main Suresh bol raha hoon SecureLife Insurance se. Aapko ek bahut achha investment plan batana tha.
+Customer: Haan bataiye, kya hai?
+Agent: Sir yeh plan mein aapko guaranteed returns milenge, 12% fixed every year. Bilkul FD jaisa, bas insurance ka wrapper hai.
+Customer: Achha? Guaranteed hai? Koi risk toh nahi?
+Agent: Haan sir, 100% guaranteed. Risk free hai. Aur tax free bhi. Tension mat lo, bas sign karo.
+Customer: Free look period ke baare mein kuch batao.
+Agent: Arre sir, free look ka jhanjhat mat karo. Yeh sirf formality hai. Trust karo mujhe.
+Customer: Premium kitna hoga?
+Agent: Sirf 50,000 per year. 10 saal mein double ho jayega guaranteed. Aaj decide karo, offer kal khatam ho raha hai. Manager ka special quota hai.
+Customer: Theek hai sochta hoon.
+Agent: Sir please abhi decide karo. Kal tak yeh rate nahi milega.

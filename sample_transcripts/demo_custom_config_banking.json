@@ -1,0 +1,21 @@
+{
+    "client_id": null,
+    "client_config": {
+        "domain": "Banking",
+        "company_name": "NextGen Bank",
+        "products": [
+            "Credit Cards",
+            "Personal Loans"
+        ],
+        "policies": [
+            "Agent must always verify user identity with at least two questions before discussing account details.",
+            "Agent must never ask for the customer's PIN or full CVV over the phone."
+        ],
+        "risk_triggers": [
+            "unauthorized transaction",
+            "card stolen",
+            "account blocked"
+        ]
+    },
+    "transcript": "Agent: Thank you for calling NextGen Bank. Can you please confirm your date of birth and mother's maiden name?\nCustomer: It's January 1st, 1980, and Smith. I'm calling because I see a charge I didn't make for Rs. 5000.\nAgent: I understand, let's look into that right away. Could you please give me your 4-digit card PIN so I can bypass the security lock on my end?"
+}
